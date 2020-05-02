@@ -1,0 +1,9 @@
+[submodule "dependencies/glfw"]
+	path = dependencies/glfw
+	url = https://github.com/h4wkee/glfw.git
+[submodule "dependencies/glm"]
+	path = dependencies/glm
+	url = https://github.com/h4wkee/glm.git
+[submodule "dependencies/glad"]
+	path = dependencies/glad
+	url = https://github.com/h4wkee/glad-dump.git
