@@ -27,3 +27,9 @@ add_executable(cuda_fdtd_sound_wave ${SRC_FILES})
 
 add_dependencies(cuda_fdtd_sound_wave glad glfw glm)
 target_link_libraries(cuda_fdtd_sound_wave glad glfw glm ${OPENGL_gl_LIBRARY})
+
+set_target_properties(
+        cuda_fdtd_sound_wave
+        PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/build"
+)

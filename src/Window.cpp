@@ -109,6 +109,7 @@ bool Window::update()
 	if (!glfwWindowShouldClose(_window))
 	{
 		glfwSwapBuffers(_window);
+		glClear(GL_COLOR_BUFFER_BIT);
 		glfwPollEvents();
 	}
 	else
