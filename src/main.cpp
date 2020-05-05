@@ -12,7 +12,7 @@
 const float windowWidth = 800.f;
 const float windowHeight = 600.f;
 
-int main()
+int main(int argc, char * argv[])
 {
 	srand(time(NULL));
 	Window window(windowWidth, windowHeight);
@@ -24,13 +24,20 @@ int main()
 	float surfaceScale = 5.f;
 	glm::vec2 surfaceSize = {2 * surfaceScale, 2 * surfaceScale};
 	float resolution = 0.1f;
+	if(argc > 1)
+	{
+		if(!strcmp(argv[1], "-r"))
+		{
+			resolution = atof(argv[2]);
+		}
+	}
 	glm::ivec2 gridSize = {surfaceSize.x / resolution, surfaceSize.y / resolution};
 	glm::vec3 * gridColors = new glm::vec3[gridSize.x * gridSize.y];
 	AcousticFDTD fdtd(gridColors, gridSize);
 	///////////////
 
 	/////////////// OPENGL INITIALIZATION
-	float pointSize = 10.f;
+	float pointSize = resolution * 100.f;
 	float renderPadding = 0.1f;
 	glClearColor(0.33f, 0.33f, 0.33f, 1.f);
 
