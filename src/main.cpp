@@ -4,10 +4,14 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/vector_angle.hpp>
 
+#include <cuda.h>
+#include <cuda_runtime.h>
+
 #include <Window.h>
 #include <Shader.h>
 #include <Renderable.h>
 #include <AcousticFDTD.h>
+#include <Vertex.h>
 
 const float windowWidth = 800.f;
 const float windowHeight = 600.f;
@@ -32,8 +36,7 @@ int main(int argc, char * argv[])
 		}
 	}
 	glm::ivec2 gridSize = {surfaceSize.x / resolution, surfaceSize.y / resolution};
-	glm::vec3 * gridColors = new glm::vec3[gridSize.x * gridSize.y];
-	AcousticFDTD fdtd(gridColors, gridSize);
+	AcousticFDTD fdtd(gridSize);
 	///////////////
 
 	/////////////// OPENGL INITIALIZATION
@@ -50,38 +53,48 @@ int main(int argc, char * argv[])
 	glm::vec3 surfaceColor = {0.7f, 0.7f, 0.7f};
 	glm::vec3 pointsColor = {1.f, 1.f, 1.f};
 
-	std::vector<glm::vec3> surfacePositions = {
-			{-1.f * surfaceScale,1.f * surfaceScale,1.f},
-			{1.f * surfaceScale, 1.f * surfaceScale,1.f},
-			{1.f * surfaceScale, -1.f * surfaceScale, 1.f},
-			{1.f * surfaceScale, -1.f * surfaceScale, 1.f},
-			{-1.f * surfaceScale, -1.f * surfaceScale, 1.f},
-			{-1.f * surfaceScale, 1.f * surfaceScale, 1.f}
+	std::vector<Vertex> surfaceVertices = {
+			{
+				{-1.f * surfaceScale, 1.f * surfaceScale, 1.f},
+				{surfaceColor.x, surfaceColor.y, surfaceColor.z}
+			},
+			{
+				{1.f * surfaceScale, 1.f * surfaceScale,1.f},
+				{surfaceColor.x, surfaceColor.y, surfaceColor.z}
+			},
+			{
+				{1.f * surfaceScale, -1.f * surfaceScale, 1.f},
+				{surfaceColor.x, surfaceColor.y, surfaceColor.z}
+			},
+			{
+				{1.f * surfaceScale, -1.f * surfaceScale, 1.f},
+				{surfaceColor.x, surfaceColor.y, surfaceColor.z}
+			},
+			{
+				{-1.f * surfaceScale, -1.f * surfaceScale, 1.f},
+				{surfaceColor.x, surfaceColor.y, surfaceColor.z}
+			},
+			{
+				{-1.f * surfaceScale, 1.f * surfaceScale, 1.f},
+				{surfaceColor.x, surfaceColor.y, surfaceColor.z}
+			}
 	};
-	Renderable surface(surfacePositions, GL_TRIANGLES);
+	Renderable surface(surfaceVertices, GL_TRIANGLES);
 
-	Renderable * points = new Renderable[gridSize.x * gridSize.y];
-
-	std::vector<glm::vec3> pointPosition;
-	pointPosition.resize(1);
+	std::vector<Vertex> pointsVertices;
+	pointsVertices.resize(gridSize.x * gridSize.y);
 	glm::vec2 base = {-(gridSize.x - resolution) * resolution / 2.f, -(gridSize.y - resolution) * resolution / 2.f};
 	for(unsigned int i = 0; i < gridSize.x; ++i)
 	{
 		for(unsigned j = 0; j < gridSize.y; ++j)
 		{
-			pointPosition[0] = {i * resolution + base.x, j * resolution + base.y, 1.f};
-			points[i * gridSize.y + j].init(pointPosition, GL_POINTS, pointSize);
+			pointsVertices.push_back({
+				{i * resolution + base.x, j * resolution + base.y, 1.f},
+				{1.f, 1.f, 1.f}
+			});
 		}
 	}
-
-	//	std::vector<glm::vec3> pointsPositions = {
-//			{-0.5f,0.5f,1.f},
-//			{0.5f, 0.5f,1.f},
-//			{0.f, -0.5f, 1.f}
-//	};
-
-	//Renderable points(pointsPositions, GL_POINTS);
-
+	Renderable points{pointsVertices, GL_POINTS, pointSize};
 	/////////////////
 
 	auto appStart = std::chrono::high_resolution_clock::now();
@@ -97,25 +110,23 @@ int main(int argc, char * argv[])
 		shader.setUniform4m("view", glm::value_ptr(view));
 		shader.setUniform4m("model", glm::value_ptr(model));
 
-		shader.setUniform3("color", surfaceColor.x, surfaceColor.y, surfaceColor.z);
+		//shader.setUniform3("color", surfaceColor.x, surfaceColor.y, surfaceColor.z);
 		surface.draw();
 
-//		shader.setUniform3("color", pointsColor.x, pointsColor.y, pointsColor.z);
-//		points.draw();
-
 		fdtd.draw();
-		for(unsigned int i = 0; i < gridSize.x; ++i)
-		{
-			for(unsigned j = 0; j < gridSize.y; ++j)
-			{
-				glm::vec3 pointColor = gridColors[i * gridSize.y + j];
-				//std::cout << pointColor.x << ',' << pointColor.y << ',' << pointColor.z << std::endl;
-				shader.setUniform3("color", pointColor.x, 1.f, 1.f);
-				points[i * gridSize.y + j].draw();
-			}
-		}
-	}
 
-	delete[] gridColors;
+//		shader.setUniform3("color", pointsColor.x, pointsColor.y, pointsColor.z);
+		points.draw();
+//		for(unsigned int i = 0; i < gridSize.x; ++i)
+//		{
+//			for(unsigned j = 0; j < gridSize.y; ++j)
+//			{
+//				glm::vec3 pointColor = gridColors[i * gridSize.y + j];
+//				//std::cout << pointColor.x << ',' << pointColor.y << ',' << pointColor.z << std::endl;
+//				shader.setUniform3("color", pointColor.x, 1.f, 1.f);
+//				points[i * gridSize.y + j].draw();
+//			}
+//		}
+	}
 	return 0;
 }

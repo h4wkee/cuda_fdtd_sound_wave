@@ -15,14 +15,12 @@ public:
 		float vy;
 		float soundPressure;
 	};
-	AcousticFDTD(glm::vec3 * gridColors, glm::ivec2 & gridSize);
+	AcousticFDTD(glm::ivec2 & gridSize, void * vertexPointer);
 	~AcousticFDTD();
 
 	void updateV();
 	void updateP();
-	void mur1st();
 	void mur2nd();
-	void mur1stCopy();
 	void mur2ndCopy();
 
 	void draw();
@@ -35,13 +33,9 @@ private:
 	int _nPoint = 0;
 	float _sigPoint = 0.f;
 
-	glm::vec3 * _gridColors;
-
-	SpacePoint * _grid;
-	float * _murX1;
-	float * _murX2;
-	float * _murY1;
-	float * _murY2;
+	SpacePoint * _grid[2];
+	float * _murX[2][2];
+	float * _murY[2][2];
 
 	float _dx = 10.0e-3;    // Spatial Resolution [m/space_point]
 	float _dt = 15.0e-6;    // Temporal Resolution [s/step]
@@ -50,4 +44,7 @@ private:
 	float _density   = 1.29;    // [kg/m^3]
 	float _bulkModulus = 142.0e3;	// [Pa]
 	float _freq = 1.0e3;    // Frequency of Initial Waveform [Hz]
+
+	void * _vertexPointer;
+	bool _bufferSwap = 0;
 };
