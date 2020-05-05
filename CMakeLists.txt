@@ -18,7 +18,7 @@ include_directories(
 )
 
 add_subdirectory(dependencies/glad)
-add_subdirectory(dependencies/GLFW)
+add_subdirectory(dependencies/glfw)
 add_subdirectory(dependencies/glm)
 
 file(GLOB_RECURSE SRC_FILES src/*.cpp)
