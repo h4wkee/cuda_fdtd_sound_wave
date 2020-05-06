@@ -13,11 +13,11 @@ include_directories(
         include
         dependencies
         dependencies/glad/include
-        dependencies/glfw/include
+        #dependencies/glfw/include
         dependencies/glm/include
 )
 
-add_subdirectory(dependencies/glad)
+#add_subdirectory(dependencies/glad)
 add_subdirectory(dependencies/glfw)
 add_subdirectory(dependencies/glm)
 
@@ -25,8 +25,10 @@ file(GLOB_RECURSE SRC_FILES src/*.cpp)
 
 add_executable(cuda_fdtd_sound_wave ${SRC_FILES})
 
-add_dependencies(cuda_fdtd_sound_wave glad glfw glm)
-target_link_libraries(cuda_fdtd_sound_wave glad glfw glm ${OPENGL_gl_LIBRARY})
+#add_dependencies(cuda_fdtd_sound_wave glad glfw glm)
+add_dependencies(cuda_fdtd_sound_wave glad glm)
+#target_link_libraries(cuda_fdtd_sound_wave glad glfw glm ${OPENGL_gl_LIBRARY})
+target_link_libraries(cuda_fdtd_sound_wave glad glm ${OPENGL_gl_LIBRARY})
 
 set_target_properties(
         cuda_fdtd_sound_wave
