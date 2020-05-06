@@ -13,7 +13,7 @@ include_directories(
         include
         dependencies
         dependencies/glad/include
-        #dependencies/glfw/include
+        dependencies/glfw/include
         dependencies/glm/include
 )
 
