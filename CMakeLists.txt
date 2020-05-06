@@ -23,6 +23,8 @@ add_subdirectory(dependencies/glm)
 
 file(GLOB_RECURSE SRC_FILES src/*.cpp)
 
+link_directories("/home/student/165095/")
+
 add_executable(cuda_fdtd_sound_wave ${SRC_FILES})
 
 #add_dependencies(cuda_fdtd_sound_wave glad glfw glm)

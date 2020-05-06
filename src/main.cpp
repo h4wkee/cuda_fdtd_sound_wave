@@ -19,6 +19,7 @@ int main(int argc, char * argv[])
 	Window window(windowWidth, windowHeight);
 	if(!window.isOpened())
 	{
+		std::cout << "Couldn't create a window!" << std::endl;
 		return 1;
 	}
 	/////////////// FDTD INITIALIZATION
