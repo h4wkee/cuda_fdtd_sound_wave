@@ -3,6 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/vector_angle.hpp>
+#include <chrono>
 
 #include <Window.h>
 #include <Shader.h>
@@ -91,7 +92,7 @@ int main(int argc, char * argv[])
 		auto appTime = std::chrono::high_resolution_clock::now();
 
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(appTime - appStart).count();
-		pointsColor = {sin(duration * 0.01f), 0.5f, 1.f};
+		pointsColor = glm::vec3{sin(duration * 0.01f), 0.5f, 1.f};
 
 		shader.setUniform4m("projection", glm::value_ptr(projection));
 		shader.setUniform4m("view", glm::value_ptr(view));

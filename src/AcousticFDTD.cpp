@@ -1,6 +1,6 @@
 #include "AcousticFDTD.h"
 
-#import <cmath>
+#include <cmath>
 
 AcousticFDTD::AcousticFDTD(glm::vec3 * gridColors, glm::ivec2 & gridSize)
 {
