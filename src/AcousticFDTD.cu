@@ -1,6 +1,6 @@
 #include "AcousticFDTD.h"
 
-#import <cmath>
+#include <cmath>
 
 const int CUDA_THREADS_X = 256;
 const int CUDA_THREADS_Y = 256;

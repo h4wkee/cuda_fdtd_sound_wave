@@ -18,18 +18,22 @@ include_directories(
 )
 
 add_subdirectory(dependencies/glad)
-add_subdirectory(dependencies/glfw)
+#add_subdirectory(dependencies/glfw)
 add_subdirectory(dependencies/glm)
 
 file(GLOB_RECURSE SRC_FILES src/*.cpp src/*.cu)
 
 set_target_properties(cuda_fdtd_sound_wave PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 
+link_directories("/home/student/165095/")
+
 add_executable(cuda_fdtd_sound_wave ${SRC_FILES})
 
 set_property(TARGET cuda_fdtd_sound_wave PROPERTY CUDA_SEPARABLE_COMPILATION ON)
 
-add_dependencies(cuda_fdtd_sound_wave glad glfw glm)
+#add_dependencies(cuda_fdtd_sound_wave glad glfw glm)
+add_dependencies(cuda_fdtd_sound_wave glad glm)
+
 target_link_libraries(cuda_fdtd_sound_wave glad glfw glm ${OPENGL_gl_LIBRARY})
 
 set_target_properties(
