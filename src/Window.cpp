@@ -59,7 +59,8 @@ bool Window::_init(int width, int height)
 	glfwWindowHint(GLFW_SAMPLES, 0);
 	glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_TRUE);
 
-	_window = glfwCreateWindow(_width, _height, "", monitor, nullptr);
+	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+	_window = glfwCreateWindow(_width, _height, "", nullptr, nullptr);
 
 	if (!_window)
 	{
