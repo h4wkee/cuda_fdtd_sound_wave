@@ -2,6 +2,9 @@
 
 #include <iostream>
 
+#include <cuda.h>
+#include <cuda_runtime.h>
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/vector_angle.hpp>
@@ -18,11 +21,6 @@ public:
 	AcousticFDTD(glm::ivec2 & gridSize, void * vertexPointer);
 	~AcousticFDTD();
 
-	void updateV();
-	void updateP();
-	void mur2nd();
-	void mur2ndCopy();
-
 	void draw();
 	void randomPointSource();
 private:
@@ -34,8 +32,8 @@ private:
 	float _sigPoint = 0.f;
 
 	SpacePoint * _grid[2];
-	float * _murX[2][2];
-	float * _murY[2][2];
+	float * _murX[2];
+	float * _murY[2];
 
 	float _dx = 10.0e-3;    // Spatial Resolution [m/space_point]
 	float _dt = 15.0e-6;    // Temporal Resolution [s/step]
@@ -45,6 +43,10 @@ private:
 	float _bulkModulus = 142.0e3;	// [Pa]
 	float _freq = 1.0e3;    // Frequency of Initial Waveform [Hz]
 
-	void * _vertexPointer;
+	glm::vec3 * _vertexPointer;
 	bool _bufferSwap = 0;
+
+	const dim3 _cudaBlockSize;
+	const dim3 _cudaGridSize;
+	glm::ivec2 _dataPerThread;
 };

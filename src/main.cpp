@@ -11,7 +11,6 @@
 #include <Shader.h>
 #include <Renderable.h>
 #include <AcousticFDTD.h>
-#include <Vertex.h>
 
 const float windowWidth = 800.f;
 const float windowHeight = 600.f;
@@ -36,7 +35,6 @@ int main(int argc, char * argv[])
 		}
 	}
 	glm::ivec2 gridSize = {surfaceSize.x / resolution, surfaceSize.y / resolution};
-	AcousticFDTD fdtd(gridSize);
 	///////////////
 
 	/////////////// OPENGL INITIALIZATION
@@ -94,7 +92,12 @@ int main(int argc, char * argv[])
 			});
 		}
 	}
+	/////////////////
+
 	Renderable points{pointsVertices, GL_POINTS, pointSize};
+
+	AcousticFDTD fdtd(gridSize, points.getVertexBufferPointer());
+
 	/////////////////
 
 	auto appStart = std::chrono::high_resolution_clock::now();
@@ -110,23 +113,11 @@ int main(int argc, char * argv[])
 		shader.setUniform4m("view", glm::value_ptr(view));
 		shader.setUniform4m("model", glm::value_ptr(model));
 
-		//shader.setUniform3("color", surfaceColor.x, surfaceColor.y, surfaceColor.z);
 		surface.draw();
 
 		fdtd.draw();
 
-//		shader.setUniform3("color", pointsColor.x, pointsColor.y, pointsColor.z);
 		points.draw();
-//		for(unsigned int i = 0; i < gridSize.x; ++i)
-//		{
-//			for(unsigned j = 0; j < gridSize.y; ++j)
-//			{
-//				glm::vec3 pointColor = gridColors[i * gridSize.y + j];
-//				//std::cout << pointColor.x << ',' << pointColor.y << ',' << pointColor.z << std::endl;
-//				shader.setUniform3("color", pointColor.x, 1.f, 1.f);
-//				points[i * gridSize.y + j].draw();
-//			}
-//		}
 	}
 	return 0;
 }
