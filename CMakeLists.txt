@@ -8,6 +8,7 @@ if(WIN32)
 endif()
 
 find_package(OpenGL)
+find_package(CUDA)
 
 include_directories(
         include
@@ -15,7 +16,7 @@ include_directories(
         dependencies/glad/include
         dependencies/glfw/include
         dependencies/glm/include
-        ${CUDA_INCLUDE_DIRS}/cuda
+        ${CUDA_INCLUDE_DIRS}
 )
 
 add_subdirectory(dependencies/glad)
