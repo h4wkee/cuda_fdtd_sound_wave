@@ -29,7 +29,7 @@ link_directories("/home/student/165095/")
 
 add_executable(cuda_fdtd_sound_wave ${SRC_FILES})
 
-set_property(TARGET cuda_fdtd_sound_wave PROPERTY CUDA_SEPARABLE_COMPILATION ON)
+#set_property(TARGET cuda_fdtd_sound_wave PROPERTY CUDA_SEPARABLE_COMPILATION ON)
 
 #add_dependencies(cuda_fdtd_sound_wave glad glfw glm)
 add_dependencies(cuda_fdtd_sound_wave glad glm)
@@ -40,6 +40,7 @@ set_target_properties(
         cuda_fdtd_sound_wave
         PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/build"
+        CUDA_SEPARABLE_COMPILATION ON
 )
 
 if(APPLE)
