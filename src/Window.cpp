@@ -23,12 +23,19 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
+void errorCallback(int error, const char* description)
+{
+	fprintf(stderr, "Error: %s\n", description);
+}
+
 bool Window::_init(int width, int height)
 {
 	if (!glfwInit())
 	{
 		return false;
 	}
+
+	glfwSetErrorCallback(errorCallback);
 
 	GLFWmonitor * monitor = nullptr;
 	if(!width) // full screen
