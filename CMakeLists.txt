@@ -15,6 +15,7 @@ include_directories(
         dependencies/glad/include
         dependencies/glfw/include
         dependencies/glm/include
+        ${CUDA_INCLUDE_DIRS}
 )
 
 add_subdirectory(dependencies/glad)
