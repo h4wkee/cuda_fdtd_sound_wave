@@ -211,11 +211,15 @@ void AcousticFDTD::draw()
 {
 	updateV<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)!_bufferSwap],
 												_grid[(int)_bufferSwap], _dtOverDx, _density);
+	cudaDeviceSynchronize();
+
 	updateP<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)!_bufferSwap],
 												_grid[(int)_bufferSwap], _dtOverDx, _bulkModulus);
+	cudaDeviceSynchronize();
 
 	mur2nd<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)!_bufferSwap],
 												_grid[(int)_bufferSwap], _murX, _murY, _dt, _dx, _density, _bulkModulus);
+	cudaDeviceSynchronize();
 	//copy previous values
 	mur2ndCopy<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid, _murX, _murY);
 
@@ -226,6 +230,8 @@ void AcousticFDTD::draw()
 	}
 
 	updateColors<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid, _vertexPointer);
+
+	cudaDeviceSynchronize();
 
 	++_nPoint;
 
