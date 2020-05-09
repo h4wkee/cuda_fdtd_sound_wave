@@ -23,8 +23,6 @@ add_subdirectory(dependencies/glm)
 
 file(GLOB_RECURSE SRC_FILES src/*.cpp src/*.cu)
 
-set_target_properties(cuda_fdtd_sound_wave PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
-
 link_directories("/home/student/165095/")
 
 add_executable(cuda_fdtd_sound_wave ${SRC_FILES})
