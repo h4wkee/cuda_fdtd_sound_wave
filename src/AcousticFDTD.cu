@@ -9,8 +9,8 @@ AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 {
 	_gridSize = gridSize;
 	//Setup CUDA
-	cudaSetDevice(cutGetMaxGflopsDeviceId());
-	cudaGLSetGLDevice(cutGetMaxGflopsDeviceId());
+	//cudaSetDevice(cutGetMaxGflopsDeviceId());
+	//cudaGLSetGLDevice(cutGetMaxGflopsDeviceId());
 
 	cudaGraphicsGLRegisterBuffer(&_cudaVertexPointer, *vbo, cudaGraphicsMapFlagsNone);
 
@@ -19,7 +19,7 @@ AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 	cudaGraphicsMapResources(1, _cudaVertexPointer, _cudaStream);
 	//_vertexPointer = static_cast<glm::vec3 *>(_cudaVertexPointer);
 	size_t size;
-	cudaGraphicsResourceGetMappedPointer((glm::vec3 **)(&_vertexPointer), &size, *_cudaVertexPointer);
+	cudaGraphicsResourceGetMappedPointer((void **)(&_vertexPointer), &size, _cudaVertexPointer);
 
 	_cudaBlockSize = dim3(CUDA_THREADS_X, CUDA_THREADS_Y);
 	const int bx = (gridSize.x + CUDA_THREADS_X - 1) / CUDA_THREADS_X;
@@ -41,10 +41,10 @@ AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 AcousticFDTD::~AcousticFDTD()
 {
 	//Unmap the CUDA stream
-	cudaGraphicsUnmapResources(1, &_cudaVertexPointer, cuda_stream);
+	cudaGraphicsUnmapResources(1, &_cudaVertexPointer, _cudaStream);
 
 //Destroy the CUDA stream
-	cudaStreamDestroy(cuda_stream);
+	cudaStreamDestroy(_cudaStream);
 
 	cudaFree(_grid[0]); cudaFree(_grid[1]);
 	cudaFree(_murX[0]); cudaFree(_murX[1]);
