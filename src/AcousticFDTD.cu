@@ -9,7 +9,8 @@ AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 {
 	_gridSize = gridSize;
 	cudaGraphicsGLRegisterBuffer(&_cudaVertexPointer, *vbo, cudaGraphicsMapFlagsNone);
-	_vertexPointer = static_cast<glm::vec3 *>(_cudaVertexPointer);
+	//_vertexPointer = static_cast<glm::vec3 *>(_cudaVertexPointer);
+	_vertexPointer = (glm::vec3 *)(_cudaVertexPointer);
 	_cudaBlockSize = dim3(CUDA_THREADS_X, CUDA_THREADS_Y);
 	const int bx = (gridSize.x + CUDA_THREADS_X - 1) / CUDA_THREADS_X;
 	const int by = (gridSize.y + CUDA_THREADS_Y - 1) / CUDA_THREADS_Y;
