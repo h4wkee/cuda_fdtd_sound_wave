@@ -5,8 +5,8 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <cuda_gl_interop.h>
-#include <helper_cuda.h>
 #include <helper_cuda_gl.h>
+#include <helper_cuda.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
