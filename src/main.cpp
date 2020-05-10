@@ -5,13 +5,13 @@
 #include <glm/gtx/vector_angle.hpp>
 #include <chrono>
 
-#include <cuda.h>
-#include <cuda_runtime.h>
-
 #include <Window.h>
 #include <Shader.h>
 #include <Renderable.h>
 #include <AcousticFDTD.h>
+
+#include <cuda.h>
+#include <cuda_runtime.h>
 
 const float windowWidth = 800.f;
 const float windowHeight = 600.f;

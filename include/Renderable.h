@@ -2,15 +2,15 @@
 
 #include <vector>
 
+#include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <Vertex.h>
+
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <cuda_gl_interop.h>
 //#include <helper_cuda.h>
 //#include <helper_cuda_gl.h>
-
-#include <glad/glad.h>
-#include <glm/glm.hpp>
-#include <Vertex.h>
 
 class Renderable
 {
