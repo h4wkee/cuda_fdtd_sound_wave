@@ -10,9 +10,6 @@
 #include <Renderable.h>
 #include <AcousticFDTD.h>
 
-#include <cuda.h>
-#include <cuda_runtime.h>
-
 const float windowWidth = 800.f;
 const float windowHeight = 600.f;
 
@@ -98,7 +95,7 @@ int main(int argc, char * argv[])
 
 	Renderable points{pointsVertices, GL_POINTS, pointSize};
 
-	AcousticFDTD fdtd(gridSize, points.getVertexBufferPointer());
+	AcousticFDTD fdtd(gridSize, points.getVBO());
 
 	/////////////////
 

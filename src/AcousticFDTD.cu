@@ -5,10 +5,11 @@
 const int CUDA_THREADS_X = 256;
 const int CUDA_THREADS_Y = 256;
 
-AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, struct cudaGraphicsResource * vertexPointer)
+AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 {
 	_gridSize = gridSize;
-	_vertexPointer = static_cast<glm::vec3 *>(vertexPointer);
+	cudaGraphicsGLRegisterBuffer(&_cudaVertexPointer, *vbo, cudaGraphicsMapFlagsNone);
+	_vertexPointer = static_cast<glm::vec3 *>(_cudaVertexPointer);
 	_cudaBlockSize = dim3(CUDA_THREADS_X, CUDA_THREADS_Y);
 	const int bx = (gridSize.x + CUDA_THREADS_X - 1) / CUDA_THREADS_X;
 	const int by = (gridSize.y + CUDA_THREADS_Y - 1) / CUDA_THREADS_Y;
@@ -221,15 +222,15 @@ void AcousticFDTD::draw()
 												_grid[(int)_bufferSwap], _murX, _murY, _dt, _dx, _density, _bulkModulus);
 	cudaDeviceSynchronize();
 	//copy previous values
-	mur2ndCopy<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid, _murX, _murY);
+	mur2ndCopy<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap], _murX, _murY);
 
 	/* Initial Waveform from a Point Source (1 pulse of sinusoidal wave with Hann window) */
 	if( _nPoint < (1.0/_freq)/_dt ){
 		_sigPoint = (1.0-cos((2.0*M_PI*_freq*_nPoint*_dt)))/2.0 * sin((2.0*M_PI*_freq*_nPoint*_dt));
-		updatePoint<<<1, 1>>>(_gridSize, _grid, _pointSource, _sigPoint);
+		updatePoint<<<1, 1>>>(_gridSize, _grid[(int)_bufferSwap], _pointSource, _sigPoint);
 	}
 
-	updateColors<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid, _vertexPointer);
+	updateColors<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap], _vertexPointer);
 
 	cudaDeviceSynchronize();
 

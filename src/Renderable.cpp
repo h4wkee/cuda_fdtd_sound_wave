@@ -16,10 +16,8 @@ Renderable::Renderable(Renderable && renderable) noexcept
 {
 	_vao = renderable._vao;
 	_vbo = renderable._vbo;
-	_vertexPointer = renderable._vertexPointer;
 	renderable._vao = 0;
 	renderable._vbo = 0;
-	renderable._vertexPointer = nullptr;
 }
 
 Renderable::~Renderable()
@@ -59,8 +57,6 @@ void Renderable::init(std::vector<Vertex> & vertices, GLenum type, float pointSi
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	//checkCudaErrors(cudaGraphicsGLRegisterBuffer(&_vertexPointer, _vbo, cudaGraphicsMapFlagsNone));
-
-	cudaGraphicsGLRegisterBuffer(&_vertexPointer, _vbo, cudaGraphicsMapFlagsNone);
 
 	glPointSize(pointSize);
 

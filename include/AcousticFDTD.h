@@ -21,7 +21,7 @@ public:
 		float vy;
 		float soundPressure;
 	};
-	AcousticFDTD(glm::ivec2 & gridSize, struct cudaGraphicsResource * vertexPointer);
+	AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo);
 	~AcousticFDTD();
 
 	void draw();
@@ -47,9 +47,10 @@ private:
 	float _freq = 1.0e3;    // Frequency of Initial Waveform [Hz]
 
 	glm::vec3 * _vertexPointer;
+	struct cudaGraphicsResource * _cudaVertexPointer;
 	bool _bufferSwap = 0;
 
-	const dim3 _cudaBlockSize;
-	const dim3 _cudaGridSize;
+	dim3 _cudaBlockSize;
+	dim3 _cudaGridSize;
 	glm::ivec2 _dataPerThread;
 };
