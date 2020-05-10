@@ -213,9 +213,9 @@ __global__ void updatePoint(glm::ivec2 gridSize, AcousticFDTD::SpacePoint * grid
 
 void AcousticFDTD::draw()
 {
-	//cudaGraphicsMapResources(1, &_cudaVboRes, 0);
-	//size_t size;
-	//cudaGraphicsResourceGetMappedPointer((void **)(&_vertexPointer), &size, _cudaVboRes);
+	cudaGraphicsMapResources(1, &_cudaVboRes, 0);
+	size_t size;
+	cudaGraphicsResourceGetMappedPointer((void **)(&_vertexPointer), &size, _cudaVboRes);
 
 	updateV<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)!_bufferSwap],
 												_grid[(int)_bufferSwap], _dtOverDx, _density);
@@ -242,7 +242,7 @@ void AcousticFDTD::draw()
 
 	cudaDeviceSynchronize();
 
-	//cudaGraphicsUnmapResources(1, &_cudaVboRes, 0);
+	cudaGraphicsUnmapResources(1, &_cudaVboRes, 0);
 
 	++_nPoint;
 

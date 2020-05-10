@@ -94,8 +94,8 @@ int main(int argc, char * argv[])
 	/////////////////
 
 	Renderable points{pointsVertices, GL_POINTS, pointSize};
-
-	AcousticFDTD fdtd(gridSize, points.getVBO());
+	GLuint * vbo = points.getVBO();
+	AcousticFDTD fdtd(gridSize, vbo);
 
 	/////////////////
 
