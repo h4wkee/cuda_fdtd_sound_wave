@@ -16,7 +16,7 @@ AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 
 	cudaStreamCreate(&_cudaStream);
 
-	cudaGraphicsMapResources(1, _cudaVertexPointer, _cudaStream);
+	cudaGraphicsMapResources(1, &_cudaVertexPointer, _cudaStream);
 	//_vertexPointer = static_cast<glm::vec3 *>(_cudaVertexPointer);
 	size_t size;
 	cudaGraphicsResourceGetMappedPointer((void **)(&_vertexPointer), &size, _cudaVertexPointer);
