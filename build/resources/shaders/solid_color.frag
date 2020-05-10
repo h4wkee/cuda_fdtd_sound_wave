@@ -1,6 +1,6 @@
 layout (location = 0) out vec4 outColor;
 
-in vec3 Color
+in vec3 Color;
 
 //uniform vec3 color;
 
