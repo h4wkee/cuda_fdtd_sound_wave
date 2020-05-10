@@ -242,7 +242,7 @@ void AcousticFDTD::draw()
 
 	cudaDeviceSynchronize();
 
-	cudaGraphicsUnmapResources(1, _cudaVboRes, 0);
+	cudaGraphicsUnmapResources(1, &_cudaVboRes, 0);
 
 	++_nPoint;
 
