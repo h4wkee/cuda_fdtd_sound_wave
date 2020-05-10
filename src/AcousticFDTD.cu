@@ -8,9 +8,19 @@ const int CUDA_THREADS_Y = 256;
 AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 {
 	_gridSize = gridSize;
+	//Setup CUDA
+	cudaSetDevice(cutGetMaxGflopsDeviceId());
+	cudaGLSetGLDevice(cutGetMaxGflopsDeviceId());
+
 	cudaGraphicsGLRegisterBuffer(&_cudaVertexPointer, *vbo, cudaGraphicsMapFlagsNone);
+
+	cudaStreamCreate(&_cudaStream);
+
+	cudaGraphicsMapResources(1, _cudaVertexPointer, _cudaStream);
 	//_vertexPointer = static_cast<glm::vec3 *>(_cudaVertexPointer);
-	_vertexPointer = (glm::vec3 *)(_cudaVertexPointer);
+	size_t size;
+	cudaGraphicsResourceGetMappedPointer((glm::vec3 **)(&_vertexPointer), &size, *_cudaVertexPointer);
+
 	_cudaBlockSize = dim3(CUDA_THREADS_X, CUDA_THREADS_Y);
 	const int bx = (gridSize.x + CUDA_THREADS_X - 1) / CUDA_THREADS_X;
 	const int by = (gridSize.y + CUDA_THREADS_Y - 1) / CUDA_THREADS_Y;
@@ -30,6 +40,12 @@ AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 
 AcousticFDTD::~AcousticFDTD()
 {
+	//Unmap the CUDA stream
+	cudaGraphicsUnmapResources(1, &_cudaVertexPointer, cuda_stream);
+
+//Destroy the CUDA stream
+	cudaStreamDestroy(cuda_stream);
+
 	cudaFree(_grid[0]); cudaFree(_grid[1]);
 	cudaFree(_murX[0]); cudaFree(_murX[1]);
 	cudaFree(_murY[0]); cudaFree(_murY[1]);
@@ -232,7 +248,7 @@ void AcousticFDTD::draw()
 		cudaDeviceSynchronize();
 	}
 
-	//updateColors<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap], _vertexPointer);
+	updateColors<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap], _vertexPointer);
 
 	cudaDeviceSynchronize();
 
