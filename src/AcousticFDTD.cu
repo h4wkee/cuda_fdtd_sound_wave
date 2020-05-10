@@ -250,7 +250,7 @@ void AcousticFDTD::draw()
 		cudaDeviceSynchronize();
 	}
 
-	updateColors<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap], _vertexPointer);
+	//updateColors<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap], _vertexPointer);
 
 	cudaDeviceSynchronize();
 
