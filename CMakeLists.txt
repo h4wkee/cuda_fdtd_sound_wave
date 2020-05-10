@@ -20,6 +20,14 @@ include_directories(
         ${CUDA_HOME}/samples/common/inc/
 )
 
+cuda_include_directories(
+        include
+        dependencies
+        dependencies/glad/include
+        dependencies/glfw/include
+        dependencies/glm/include
+)
+
 link_directories("/home/student/165095/")
 
 add_subdirectory(dependencies/glad)
