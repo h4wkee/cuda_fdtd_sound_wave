@@ -17,6 +17,7 @@ include_directories(
         dependencies/glfw/include
         dependencies/glm/include
         ${CUDA_INCLUDE_DIRS}
+        ${CUDA_HOME}/samples/common/inc/
 )
 
 add_subdirectory(dependencies/glad)
