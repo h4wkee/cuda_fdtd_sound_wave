@@ -58,7 +58,9 @@ void Renderable::init(std::vector<Vertex> & vertices, GLenum type, float pointSi
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	checkCudaErrors(cudaGraphicsGLRegisterBuffer(&_vertexPointer, _vbo, cudaGraphicsMapFlagsNone));
+	//checkCudaErrors(cudaGraphicsGLRegisterBuffer(&_vertexPointer, _vbo, cudaGraphicsMapFlagsNone));
+
+	cudaGraphicsGLRegisterBuffer(&_vertexPointer, _vbo, cudaGraphicsMapFlagsNone);
 
 	glPointSize(pointSize);
 
