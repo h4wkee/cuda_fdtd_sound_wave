@@ -33,7 +33,7 @@ add_subdirectory(dependencies/glm)
 
 file(GLOB_RECURSE SRC_FILES src/*.cpp src/*.cu)
 
-add_executable(cuda_fdtd_sound_wave ${SRC_FILES})
+cuda_add_executable(cuda_fdtd_sound_wave ${SRC_FILES})
 
 #add_dependencies(cuda_fdtd_sound_wave glad glfw glm)
 add_dependencies(cuda_fdtd_sound_wave glad glm)
