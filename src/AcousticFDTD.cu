@@ -215,7 +215,7 @@ void AcousticFDTD::draw()
 {
 	cudaGraphicsMapResources(1, &_cudaVboRes, 0);
 	size_t size;
-	cudaGraphicsResourceGetMappedPointer((void **)(&_vertexPointer), &size, _cudaVboRes);
+	//cudaGraphicsResourceGetMappedPointer((void **)(&_vertexPointer), &size, _cudaVboRes);
 
 	updateV<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)!_bufferSwap],
 												_grid[(int)_bufferSwap], _dtOverDx, _density);
@@ -238,7 +238,7 @@ void AcousticFDTD::draw()
 		cudaDeviceSynchronize();
 	}
 
-	updateColors<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap], _vertexPointer);
+	//updateColors<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap], _vertexPointer);
 
 	cudaDeviceSynchronize();
 
