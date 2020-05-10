@@ -32,10 +32,10 @@ Renderable::~Renderable()
 	{
 		glDeleteVertexArrays(1, &_vao);
 	}
-	if(_vertexPointer)
-	{
-		cudaGLUnmapbufferObject(_vbo);
-	}
+//	if(_vertexPointer)
+//	{
+//		cudaGLUnmapbufferObject(_vbo);
+//	}
 }
 
 void Renderable::draw()
