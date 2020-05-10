@@ -14,9 +14,10 @@ AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 
 	cudaGraphicsGLRegisterBuffer(&_cudaVertexPointer, *vbo, cudaGraphicsMapFlagsNone);
 
-	cudaStreamCreate(&_cudaStream);
+	//cudaStreamCreate(&_cudaStream);
 
-	cudaGraphicsMapResources(1, &_cudaVertexPointer, _cudaStream);
+	cudaGraphicsMapResources(1, &_cudaVertexPointer);
+	//cudaGraphicsMapResources(1, &_cudaVertexPointer, _cudaStream);
 	//_vertexPointer = static_cast<glm::vec3 *>(_cudaVertexPointer);
 	size_t size;
 	cudaGraphicsResourceGetMappedPointer((void **)(&_vertexPointer), &size, _cudaVertexPointer);
@@ -41,10 +42,11 @@ AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 AcousticFDTD::~AcousticFDTD()
 {
 	//Unmap the CUDA stream
-	cudaGraphicsUnmapResources(1, &_cudaVertexPointer, _cudaStream);
+	cudaGraphicsUnmapResources(1, &_cudaVertexPointer);
+	//cudaGraphicsUnmapResources(1, &_cudaVertexPointer, _cudaStream);
 
 //Destroy the CUDA stream
-	cudaStreamDestroy(_cudaStream);
+	//cudaStreamDestroy(_cudaStream);
 
 	cudaFree(_grid[0]); cudaFree(_grid[1]);
 	cudaFree(_murX[0]); cudaFree(_murX[1]);
