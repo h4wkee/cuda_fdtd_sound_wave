@@ -8,19 +8,8 @@ const int CUDA_THREADS_Y = 256;
 AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 {
 	_gridSize = gridSize;
-	//Setup CUDA
-	//cudaSetDevice(cutGetMaxGflopsDeviceId());
-	//cudaGLSetGLDevice(cutGetMaxGflopsDeviceId());
 
-	cudaGraphicsGLRegisterBuffer(&_cudaVertexPointer, *vbo, cudaGraphicsMapFlagsNone);
-
-	//cudaStreamCreate(&_cudaStream);
-
-	cudaGraphicsMapResources(1, &_cudaVertexPointer);
-	//cudaGraphicsMapResources(1, &_cudaVertexPointer, _cudaStream);
-	//_vertexPointer = static_cast<glm::vec3 *>(_cudaVertexPointer);
-	size_t size;
-	cudaGraphicsResourceGetMappedPointer((void **)(&_vertexPointer), &size, _cudaVertexPointer);
+	cudaGraphicsGLRegisterBuffer(&_cudaVboRes, *vbo, cudaGraphicsMapFlagsNone);
 
 	_cudaBlockSize = dim3(CUDA_THREADS_X, CUDA_THREADS_Y);
 	const int bx = (gridSize.x + CUDA_THREADS_X - 1) / CUDA_THREADS_X;
@@ -41,12 +30,7 @@ AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 
 AcousticFDTD::~AcousticFDTD()
 {
-	//Unmap the CUDA stream
-	cudaGraphicsUnmapResources(1, &_cudaVertexPointer);
-	//cudaGraphicsUnmapResources(1, &_cudaVertexPointer, _cudaStream);
-
-//Destroy the CUDA stream
-	//cudaStreamDestroy(_cudaStream);
+	cudaGraphicsUnregisterResource(vbo_res)
 
 	cudaFree(_grid[0]); cudaFree(_grid[1]);
 	cudaFree(_murX[0]); cudaFree(_murX[1]);
@@ -229,6 +213,10 @@ __global__ void updatePoint(glm::ivec2 gridSize, AcousticFDTD::SpacePoint * grid
 
 void AcousticFDTD::draw()
 {
+	cudaGraphicsMapResources(1, &_cudaVboRes, 0);
+	size_t size;
+	cudaGraphicsResourceGetMappedPointer((void **)(&_vertexPointer), &size, _cudaVboRes);
+
 	updateV<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)!_bufferSwap],
 												_grid[(int)_bufferSwap], _dtOverDx, _density);
 	cudaDeviceSynchronize();
@@ -250,9 +238,11 @@ void AcousticFDTD::draw()
 		cudaDeviceSynchronize();
 	}
 
-	//updateColors<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap], _vertexPointer);
+	updateColors<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap], _vertexPointer);
 
 	cudaDeviceSynchronize();
+
+	cudaGraphicsUnmapResources(1, _cudaVboRes, 0)
 
 	++_nPoint;
 

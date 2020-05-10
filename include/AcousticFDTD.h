@@ -48,8 +48,7 @@ private:
 	float _freq = 1.0e3;    // Frequency of Initial Waveform [Hz]
 
 	glm::vec3 * _vertexPointer;
-	cudaStream_t _cudaStream;
-	struct cudaGraphicsResource * _cudaVertexPointer;
+	struct cudaGraphicsResource * _cudaVboRes;
 	bool _bufferSwap = 0;
 
 	dim3 _cudaBlockSize;
