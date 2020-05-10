@@ -30,7 +30,7 @@ AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 
 AcousticFDTD::~AcousticFDTD()
 {
-	cudaGraphicsUnregisterResource(vbo_res)
+	cudaGraphicsUnregisterResource(_cudaVboRes);
 
 	cudaFree(_grid[0]); cudaFree(_grid[1]);
 	cudaFree(_murX[0]); cudaFree(_murX[1]);
