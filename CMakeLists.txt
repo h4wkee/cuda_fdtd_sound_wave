@@ -28,7 +28,7 @@ file(GLOB_RECURSE SRC_FILES src/*.cpp src/*.cu)
 
 link_directories("/home/student/165095/")
 
-add_executable(cuda_fdtd_sound_wave ${SRC_FILES})
+cuda_add_executable(cuda_fdtd_sound_wave ${SRC_FILES})
 
 #set_property(TARGET cuda_fdtd_sound_wave PROPERTY CUDA_SEPARABLE_COMPILATION ON)
 
