@@ -26,12 +26,11 @@ add_subdirectory(dependencies/glad)
 #add_subdirectory(dependencies/glfw)
 add_subdirectory(dependencies/glm)
 
-#CUDA_COMPILE(cuda_o src/AcousticFDTD.cu)
+CUDA_COMPILE(cuda_o src/AcousticFDTD.cu)
 
-file(GLOB_RECURSE SRC_FILES src/*.cpp src/*.cu)
+file(GLOB_RECURSE SRC_FILES src/*.cpp)
 
-#add_executable(cuda_fdtd_sound_wave ${SRC_FILES} ${cuda_o})
-cuda_add_executable(cuda_fdtd_sound_wave ${SRC_FILES})
+add_executable(cuda_fdtd_sound_wave ${SRC_FILES} ${cuda_o})
 
 #add_dependencies(cuda_fdtd_sound_wave glad glfw glm)
 add_dependencies(cuda_fdtd_sound_wave glad glm)
