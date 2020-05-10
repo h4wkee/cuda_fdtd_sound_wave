@@ -20,7 +20,7 @@ public:
 	void draw();
 	void init(std::vector<Vertex> & vertices, GLenum type = GL_POINTS, float pointSize = 1.f);
 
-	void * getVertexBufferPointer() { return _vertexPointer; }
+	struct cudaGraphicsResource * getVertexBufferPointer() { return _vertexPointer; }
 
 private:
 	Renderable(const Renderable& renderable) = delete;
@@ -28,7 +28,8 @@ private:
 
 	GLuint _vao = 0;
 	GLuint _vbo = 0;
-	void * _vertexPointer = nullptr;
+	//void * _vertexPointer = nullptr;
+	struct cudaGraphicsResource * _vertexPointer;
 
 	GLenum _type;
 	unsigned int _vertexCount = 0;

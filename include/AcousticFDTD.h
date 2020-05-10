@@ -18,7 +18,7 @@ public:
 		float vy;
 		float soundPressure;
 	};
-	AcousticFDTD(glm::ivec2 & gridSize, void * vertexPointer);
+	AcousticFDTD(glm::ivec2 & gridSize, struct cudaGraphicsResource * vertexPointer);
 	~AcousticFDTD();
 
 	void draw();

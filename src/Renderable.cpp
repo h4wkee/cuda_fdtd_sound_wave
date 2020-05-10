@@ -53,10 +53,12 @@ void Renderable::init(std::vector<Vertex> & vertices, GLenum type, float pointSi
 
 	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
 	glBufferData(GL_ARRAY_BUFFER, _vertexCount * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW); // CUDA: GL_DYNAMIC_COPY?
-	cudaGLRegisterBufferObject(_vbo);
-	cudaGLMapBufferObject(&_vertexPointer, _vbo);
+	//cudaGLRegisterBufferObject(_vbo);
+	//cudaGLMapBufferObject(&_vertexPointer, _vbo);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	checkCudaErrors(cudaGraphicsGLRegisterBuffer(&_vertexPointer, _vbo, cudaGraphicsMapFlagsNone));
 
 	glPointSize(pointSize);
 

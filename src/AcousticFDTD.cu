@@ -5,7 +5,7 @@
 const int CUDA_THREADS_X = 256;
 const int CUDA_THREADS_Y = 256;
 
-AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, void * vertexPointer)
+AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, struct cudaGraphicsResource * vertexPointer)
 {
 	_gridSize = gridSize;
 	_vertexPointer = static_cast<glm::vec3 *>(vertexPointer);
