@@ -114,9 +114,9 @@ int main(int argc, char * argv[])
 
 		surface.draw();
 
-		fdtd.draw();
-
 		points.draw();
+
+		fdtd.draw();
 	}
 	return 0;
 }
