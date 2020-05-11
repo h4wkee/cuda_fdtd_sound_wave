@@ -116,7 +116,7 @@ int main(int argc, char * argv[])
 
 		fdtd.draw();
 
-		//points.draw();
+		points.draw();
 	}
 	return 0;
 }
