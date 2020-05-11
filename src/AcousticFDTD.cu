@@ -218,10 +218,10 @@ __global__ void updatePoint(glm::ivec2 gridSize, AcousticFDTD::SpacePoint * grid
 
 void AcousticFDTD::draw()
 {
-	cudaError_t eError = cudaGraphicsMapResources(1, &_cudaVboRes, 0);
-	printf("CUDA error: %s\n", cudaGetErrorString(eError));
-	size_t size;
-	cudaGraphicsResourceGetMappedPointer((void **)(&_vertexPointer), &size, _cudaVboRes);
+//	cudaError_t eError = cudaGraphicsMapResources(1, &_cudaVboRes, 0);
+//	printf("CUDA error: %s\n", cudaGetErrorString(eError));
+//	size_t size;
+//	cudaGraphicsResourceGetMappedPointer((void **)(&_vertexPointer), &size, _cudaVboRes);
 
 	//cudaError_t eError = cudaGLMapBufferObject((void **)&_vertexPointer, _vbo);
 	//printf("CUDA error: %s\n", cudaGetErrorString(eError));
@@ -251,7 +251,7 @@ void AcousticFDTD::draw()
 
 	cudaDeviceSynchronize();
 
-	cudaGraphicsUnmapResources(1, &_cudaVboRes, 0);
+	//cudaGraphicsUnmapResources(1, &_cudaVboRes, 0);
 	//cudaGLUnmapBufferObject(_vbo);
 
 	++_nPoint;
