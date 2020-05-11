@@ -159,9 +159,9 @@ __global__ void mur2ndCopy(glm::ivec2 dataPerThread, glm::ivec2 gridSize, Acoust
 	for(unsigned int i = startI; i < rangeI; ++i)
 	{
 		/* Copy 1st Old Values to 2nd Old Values*/
-		for(unsigned int i = 0; i < 4; ++i)
+		for(unsigned int j = 0; j < 4; ++j)
 		{
-			murY[1][i * 4 + i] = murY[0][i * 4 + i];
+			murY[1][i * 4 + j] = murY[0][i * 4 + j];
 		}
 
 		/* Copy Present Values */
