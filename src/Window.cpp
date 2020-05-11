@@ -63,7 +63,7 @@ bool Window::_init(int width, int height)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	glfwWindowHint(GLFW_SAMPLES, 0);
+	//glfwWindowHint(GLFW_SAMPLES, 0);
 	//glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_TRUE);
 
 	_window = glfwCreateWindow(_width, _height, "Cuda FDTD Sound Wave", monitor, nullptr);
@@ -102,7 +102,7 @@ bool Window::_init(int width, int height)
 	glfwSwapBuffers(_window);
 
 	// alpha blending
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glfwSetKeyCallback(_window, escCallback);
 	glfwSetFramebufferSizeCallback(_window, framebufferSizeCallback);

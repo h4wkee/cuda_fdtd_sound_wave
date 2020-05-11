@@ -2,6 +2,9 @@
 
 #include <iostream>
 
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <cuda_gl_interop.h>
@@ -49,7 +52,7 @@ private:
 
 	glm::vec3 * _vertexPointer;
 	struct cudaGraphicsResource * _cudaVboRes;
-	GLuint _vbo;
+	//GLuint _vbo;
 	bool _bufferSwap = 0;
 
 	dim3 _cudaBlockSize;
