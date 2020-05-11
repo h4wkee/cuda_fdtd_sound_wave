@@ -12,7 +12,7 @@ AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 
 	CudaSafeCall(cudaGraphicsGLRegisterBuffer(&_cudaVboRes, *vbo, cudaGraphicsMapFlagsNone));
 
-	_cudaBlockSize = dim3(gridSize.x / _dataPerThread, CUDA_THREADS_Y / _dataPerThread);
+	_cudaBlockSize = dim3(gridSize.x / _dataPerThread.x, CUDA_THREADS_Y / _dataPerThread.y);
 	const int bx = (gridSize.x + _cudaBlockSize.x - 1) / _cudaBlockSize.x;
 	const int by = (gridSize.y + _cudaBlockSize.y - 1) / _cudaBlockSize.y;
 	_cudaGridSize = dim3(bx, by);
@@ -40,8 +40,8 @@ AcousticFDTD::~AcousticFDTD()
 __global__ void updateV(glm::ivec2 dataPerThread, glm::ivec2 gridSize, AcousticFDTD::SpacePoint * inGrid,
 		AcousticFDTD::SpacePoint * outGrid, float dtOverDx, float density)
 {
-	const int startI = (blockIdx.x * blockDim.x + threadIdx.x) * dataPerThread;
-	const int startJ = (blockIdx.y * blockDim.y + threadIdx.y) * dataPerThread;
+	const int startI = (blockIdx.x * blockDim.x + threadIdx.x) * dataPerThread.x;
+	const int startJ = (blockIdx.y * blockDim.y + threadIdx.y) * dataPerThread.y;
 
 	unsigned int rangeI = (startI + dataPerThread.x) < gridSize.x ? (startI + dataPerThread.x) : gridSize.x;
 	unsigned int rangeJ = (startJ + dataPerThread.y) < gridSize.y ? (startJ + dataPerThread.y) : gridSize.y;
@@ -66,8 +66,8 @@ __global__ void updateV(glm::ivec2 dataPerThread, glm::ivec2 gridSize, AcousticF
 __global__ void updateP(glm::ivec2 dataPerThread, glm::ivec2 gridSize, AcousticFDTD::SpacePoint * inGrid,
 		AcousticFDTD::SpacePoint * outGrid, float dtOverDx, float bulkModulus)
 {
-	const int startI = (blockIdx.x * blockDim.x + threadIdx.x) * dataPerThread;
-	const int startJ = (blockIdx.y * blockDim.y + threadIdx.y) * dataPerThread;
+	const int startI = (blockIdx.x * blockDim.x + threadIdx.x) * dataPerThread.x;
+	const int startJ = (blockIdx.y * blockDim.y + threadIdx.y) * dataPerThread.y;
 
 	unsigned int rangeI = (startI + dataPerThread.x) < gridSize.x ? (startI + dataPerThread.x) : gridSize.x;
 	unsigned int rangeJ = (startJ + dataPerThread.y) < gridSize.y ? (startJ + dataPerThread.y) : gridSize.y;
@@ -84,8 +84,8 @@ __global__ void updateP(glm::ivec2 dataPerThread, glm::ivec2 gridSize, AcousticF
 __global__ void mur2nd(glm::ivec2 dataPerThread, glm::ivec2 gridSize, AcousticFDTD::SpacePoint * inGrid, AcousticFDTD::SpacePoint * outGrid,
 		float * murX[2], float * murY[2], float dt, float dx, float density, float bulkModulus)
 {
-	const int startI = (blockIdx.x * blockDim.x + threadIdx.x) * dataPerThread;
-	const int startJ = (blockIdx.y * blockDim.y + threadIdx.y) * dataPerThread;
+	const int startI = (blockIdx.x * blockDim.x + threadIdx.x) * dataPerThread.x;
+	const int startJ = (blockIdx.y * blockDim.y + threadIdx.y) * dataPerThread.y;
 
 	unsigned int rangeI = (startI + dataPerThread.x) < (gridSize.x - 2) ? (startI + dataPerThread.x) : (gridSize.x - 2);
 	unsigned int rangeJ = (startJ + dataPerThread.y) < (gridSize.y - 2) ? (startJ + dataPerThread.y) : (gridSize.y - 2);
@@ -150,8 +150,8 @@ __global__ void mur2nd(glm::ivec2 dataPerThread, glm::ivec2 gridSize, AcousticFD
 
 __global__ void mur2ndCopy(glm::ivec2 dataPerThread, glm::ivec2 gridSize, AcousticFDTD::SpacePoint * grid, float * murX[2], float * murY[2])
 {
-	const int startI = (blockIdx.x * blockDim.x + threadIdx.x) * dataPerThread;
-	const int startJ = (blockIdx.y * blockDim.y + threadIdx.y) * dataPerThread;
+	const int startI = (blockIdx.x * blockDim.x + threadIdx.x) * dataPerThread.x;
+	const int startJ = (blockIdx.y * blockDim.y + threadIdx.y) * dataPerThread.y;
 
 	unsigned int rangeI = (startI + dataPerThread.x) < gridSize.x ? (startI + dataPerThread.x) : gridSize.x;
 	unsigned int rangeJ = (startJ + dataPerThread.y) < gridSize.y ? (startJ + dataPerThread.y) : gridSize.y;
@@ -187,8 +187,8 @@ __global__ void mur2ndCopy(glm::ivec2 dataPerThread, glm::ivec2 gridSize, Acoust
 
 __global__ void updateColors(glm::ivec2 dataPerThread, glm::ivec2 gridSize, AcousticFDTD::SpacePoint * grid, Vertex * vertexPointer)
 {
-	const int startI = (blockIdx.x * blockDim.x + threadIdx.x) * dataPerThread;
-	const int startJ = (blockIdx.y * blockDim.y + threadIdx.y) * dataPerThread;
+	const int startI = (blockIdx.x * blockDim.x + threadIdx.x) * dataPerThread.x;
+	const int startJ = (blockIdx.y * blockDim.y + threadIdx.y) * dataPerThread.y;
 
 	unsigned int rangeI = (startI + dataPerThread.x) < gridSize.x ? (startI + dataPerThread.x) : gridSize.x;
 	unsigned int rangeJ = (startJ + dataPerThread.y) < gridSize.y ? (startJ + dataPerThread.y) : gridSize.y;
