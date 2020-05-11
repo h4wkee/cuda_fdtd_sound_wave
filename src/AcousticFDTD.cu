@@ -9,7 +9,7 @@ AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 {
 	_gridSize = gridSize;
 
-	std::cout << "VBO: " << vbo << std::endl;
+	std::cout << "VBO: " << *vbo << std::endl;
 	struct cudaGraphicsResource * tmp;
 	cudaError_t eError = cudaGraphicsGLRegisterBuffer(&tmp, *vbo, cudaGraphicsMapFlagsNone);
 	printf("CUDA error: %s\n", cudaGetErrorString(eError));

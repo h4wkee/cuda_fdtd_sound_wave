@@ -75,4 +75,5 @@ void Renderable::init(std::vector<Vertex> & vertices, GLenum type, float pointSi
 	glEnableVertexAttribArray(1);
 
 	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
