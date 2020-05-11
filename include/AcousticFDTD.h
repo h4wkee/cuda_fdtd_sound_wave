@@ -49,6 +49,7 @@ private:
 
 	glm::vec3 * _vertexPointer;
 	struct cudaGraphicsResource * _cudaVboRes;
+	GLuint _vbo;
 	bool _bufferSwap = 0;
 
 	dim3 _cudaBlockSize;

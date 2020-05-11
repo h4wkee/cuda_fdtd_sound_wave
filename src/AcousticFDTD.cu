@@ -10,8 +10,10 @@ AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 	_gridSize = gridSize;
 
 	std::cout << "VBO: " << *vbo << std::endl;
-	cudaError_t eError = cudaGraphicsGLRegisterBuffer(&_cudaVboRes, *vbo, cudaGraphicsMapFlagsNone);
+	//cudaError_t eError = cudaGraphicsGLRegisterBuffer(&_cudaVboRes, *vbo, cudaGraphicsMapFlagsNone);
+	cudaError_t eError = cudaGLRegisterBufferObject(*vbo);
 	printf("CUDA error: %s\n", cudaGetErrorString(eError));
+	_vbo = *vbo;
 
 	_cudaBlockSize = dim3(CUDA_THREADS_X, CUDA_THREADS_Y);
 	const int bx = (gridSize.x + CUDA_THREADS_X - 1) / CUDA_THREADS_X;
@@ -32,7 +34,8 @@ AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 
 AcousticFDTD::~AcousticFDTD()
 {
-	cudaGraphicsUnregisterResource(_cudaVboRes);
+	//cudaGraphicsUnregisterResource(_cudaVboRes);
+	cudaGLUnregisterBufferObject(_vbo);
 
 	cudaFree(_grid[0]); cudaFree(_grid[1]);
 	cudaFree(_murX[0]); cudaFree(_murX[1]);
@@ -215,10 +218,13 @@ __global__ void updatePoint(glm::ivec2 gridSize, AcousticFDTD::SpacePoint * grid
 
 void AcousticFDTD::draw()
 {
-	cudaError_t eError = cudaGraphicsMapResources(1, &_cudaVboRes, 0);
+//	cudaError_t eError = cudaGraphicsMapResources(1, &_cudaVboRes, 0);
+//	printf("CUDA error: %s\n", cudaGetErrorString(eError));
+//	size_t size;
+//	cudaGraphicsResourceGetMappedPointer((void **)(&_vertexPointer), &size, _cudaVboRes);
+
+	cudaError_t eError = cudaGLMapBufferObject((void **)&_vertexPointer, _vbo);
 	printf("CUDA error: %s\n", cudaGetErrorString(eError));
-	size_t size;
-	cudaGraphicsResourceGetMappedPointer((void **)(&_vertexPointer), &size, _cudaVboRes);
 
 	updateV<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)!_bufferSwap],
 												_grid[(int)_bufferSwap], _dtOverDx, _density);
@@ -245,7 +251,8 @@ void AcousticFDTD::draw()
 
 	cudaDeviceSynchronize();
 
-	cudaGraphicsUnmapResources(1, &_cudaVboRes, 0);
+	//cudaGraphicsUnmapResources(1, &_cudaVboRes, 0);
+	cudaGLUnmapBufferObject(_vbo);
 
 	++_nPoint;
 
