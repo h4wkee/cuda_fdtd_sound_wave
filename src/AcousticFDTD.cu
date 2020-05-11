@@ -201,7 +201,8 @@ __global__ void updateColors(glm::ivec2 dataPerThread, glm::ivec2 gridSize, Acou
 			float amplifier = 100.f;
 			float grayScale = abs(grid[i * gridSize.y + j].soundPressure) * amplifier;
 			Vertex & v = vertexPointer[(i * gridSize.y + j)];
-			v.color = { 0.9, 1.0, 0.0, 0.0 };
+			//v.color = { 0.9, 1.0, 0.0 };
+			v.color = { grayScale, grayScale, grayScale };
 			// 2 * index + 1 because vbo consists of 2 vec3 (position and color)
 			//vertexPointer[2 * (i * gridSize.y + j) + 1] = { grayScale, grayScale, grayScale };
 			//vertexPointer[1 * (i * gridSize.y + j) + 1] = {0.5, 1.0, 0.0};
@@ -233,6 +234,7 @@ void AcousticFDTD::draw()
 	//mur2nd<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)!_bufferSwap],
 	//											_grid[(int)_bufferSwap], _murX, _murY, _dt, _dx, _density, _bulkModulus);
 	cudaDeviceSynchronize();
+	CudaCheckError();
 
 	//copy previous values
 	//mur2ndCopy<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap],

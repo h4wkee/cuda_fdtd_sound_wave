@@ -25,7 +25,7 @@ int main(int argc, char * argv[])
 	/////////////// FDTD INITIALIZATION
 	float surfaceScale = 5.f;
 	glm::vec2 surfaceSize = {2 * surfaceScale, 2 * surfaceScale};
-	float resolution = 1.f;
+	float resolution = 0.5f;
 	if(argc > 1)
 	{
 		if(!strcmp(argv[1], "-r"))
@@ -80,7 +80,7 @@ int main(int argc, char * argv[])
 	surface.initVAO();
 
 	std::vector<Vertex> pointsVertices;
-	pointsVertices.resize(gridSize.x * gridSize.y);
+	pointsVertices.reserve(gridSize.x * gridSize.y);
 	glm::vec2 base = {-(gridSize.x - resolution) * resolution / 2.f, -(gridSize.y - resolution) * resolution / 2.f};
 	for(unsigned int i = 0; i < gridSize.x; ++i)
 	{
