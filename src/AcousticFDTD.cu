@@ -10,7 +10,7 @@ AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 	_gridSize = gridSize;
 	_dataPerThread = glm::vec2(1, 1);
 
-	CudaSafeCall(cudaGraphicsGLRegisterBuffer(&_cudaVboRes, *vbo, cudaGraphicsMapFlagsNone));
+	//CudaSafeCall(cudaGraphicsGLRegisterBuffer(&_cudaVboRes, *vbo, cudaGraphicsMapFlagsNone));
 
 	//_cudaBlockSize = dim3(gridSize.x / _dataPerThread.x, gridSize.y / _dataPerThread.y);
 	_cudaBlockSize = dim3(32, 32);
@@ -251,9 +251,9 @@ void AcousticFDTD::draw()
 		CudaCheckError();
 	}
 
-	updateColors<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap], _vertexPointer);
-	cudaDeviceSynchronize();
-	CudaCheckError();
+	//updateColors<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap], _vertexPointer);
+	//cudaDeviceSynchronize();
+	//CudaCheckError();
 
 //	CudaSafeCall(cudaGraphicsUnmapResources(1, &_cudaVboRes, 0));
 
