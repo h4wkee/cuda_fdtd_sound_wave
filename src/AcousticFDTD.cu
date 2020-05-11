@@ -94,7 +94,7 @@ __global__ void mur2nd(glm::ivec2 dataPerThread, glm::ivec2 gridSize, AcousticFD
 	float v = sqrt(bulkModulus/density);	// Wave velocity
 	int i,j;
 	/////
-	outGrid[i * gridSize.y].soundPressure = murY[0][0];
+	outGrid[0].soundPressure = murY[0][0];
 
 //	for(i = startI < 2 ? 2 : startI; i < rangeI; ++i){
 //		outGrid[(i * gridSize.y)].soundPressure = - murY[1][(i * 4 + 1)]
