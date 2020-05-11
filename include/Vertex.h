@@ -11,4 +11,5 @@ struct Vertex
 	glm::vec3 position;
 	glm::vec3 color;
 	int padding[2]; // to 32 bytes
+	//int padding[10]; // to 64 bytes
 };
