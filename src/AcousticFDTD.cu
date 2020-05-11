@@ -232,14 +232,14 @@ void AcousticFDTD::draw()
 	cudaDeviceSynchronize();
 	CudaCheckError();
 
-	mur2nd<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)!_bufferSwap],
-												_grid[(int)_bufferSwap], _murX, _murY, _dt, _dx, _density, _bulkModulus);
+	//mur2nd<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)!_bufferSwap],
+												//_grid[(int)_bufferSwap], _murX, _murY, _dt, _dx, _density, _bulkModulus);
 	cudaDeviceSynchronize();
 	CudaCheckError();
 
 	//copy previous values
-	mur2ndCopy<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap],
-	                                          _murX, _murY);
+	//mur2ndCopy<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap],
+	                                          //_murX, _murY);
 	cudaDeviceSynchronize();
 	CudaCheckError();
 
