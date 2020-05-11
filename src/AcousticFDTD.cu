@@ -3,14 +3,14 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-#include <HelperCuda.h>
+#include <CudaHelper.h>
 
 AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 {
 	_gridSize = gridSize;
 	_dataPerThread = glm::vec2(1, 1);
 
-	checkCudaErrors(cudaGraphicsGLRegisterBuffer(&_cudaVboRes, *vbo, cudaGraphicsMapFlagsNone));
+	CudaSafeCall(cudaGraphicsGLRegisterBuffer(&_cudaVboRes, *vbo, cudaGraphicsMapFlagsNone));
 
 	_cudaBlockSize = dim3(gridSize.x / _dataPerThread, CUDA_THREADS_Y / _dataPerThread);
 	const int bx = (gridSize.x + _cudaBlockSize.x - 1) / _cudaBlockSize.x;
@@ -30,7 +30,7 @@ AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 
 AcousticFDTD::~AcousticFDTD()
 {
-	checkCudaErrors(cudaGraphicsUnregisterResource(_cudaVboRes));
+	CudaSafeCall(cudaGraphicsUnregisterResource(_cudaVboRes));
 
 	cudaFree(_grid[0]); cudaFree(_grid[1]);
 	cudaFree(_murX[0]); cudaFree(_murX[1]);
@@ -222,41 +222,43 @@ __global__ void updatePoint(glm::ivec2 gridSize, AcousticFDTD::SpacePoint * grid
 
 void AcousticFDTD::draw()
 {
-	checkCudaErrors(cudaGraphicsMapResources(1, &_cudaVboRes, 0));
-
+	CudaSafeCall(cudaGraphicsMapResources(1, &_cudaVboRes, 0));
 	size_t size;
-	checkCudaErrors(cudaGraphicsResourceGetMappedPointer((void **)(&_vertexPointer), &size, _cudaVboRes));
+	CudaSafeCall(cudaGraphicsResourceGetMappedPointer((void **)(&_vertexPointer), &size, _cudaVboRes));
 
-	checkCudaErrors(updateV<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)!_bufferSwap],
-												_grid[(int)_bufferSwap], _dtOverDx, _density));
+	updateV<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)!_bufferSwap],
+												_grid[(int)_bufferSwap], _dtOverDx, _density);
 	cudaDeviceSynchronize();
+	CudaCheckError();
 
-	checkCudaErrors(updateP<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)!_bufferSwap],
-												_grid[(int)_bufferSwap], _dtOverDx, _bulkModulus));
+	updateP<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)!_bufferSwap],
+												_grid[(int)_bufferSwap], _dtOverDx, _bulkModulus);
 	cudaDeviceSynchronize();
+	CudaCheckError();
 
-	//checkCudaErrors(mur2nd<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)!_bufferSwap],
-	//											_grid[(int)_bufferSwap], _murX, _murY, _dt, _dx, _density, _bulkModulus));
+	//mur2nd<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)!_bufferSwap],
+	//											_grid[(int)_bufferSwap], _murX, _murY, _dt, _dx, _density, _bulkModulus);
 	cudaDeviceSynchronize();
 
 	//copy previous values
-	//checkCudaErrors(mur2ndCopy<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap],
-	//                                          _murX, _murY));
+	//mur2ndCopy<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap],
+	//                                          _murX, _murY);
 	cudaDeviceSynchronize();
+	CudaCheckError();
 
 	// Initial Waveform from a Point Source (1 pulse of sinusoidal wave with Hann window)
 	if( _nPoint < (1.0/_freq)/_dt ){
 		_sigPoint = (1.0-cos((2.0*M_PI*_freq*_nPoint*_dt)))/2.0 * sin((2.0*M_PI*_freq*_nPoint*_dt));
-		checkCudaErrors(updatePoint<<<1, 1>>>(_gridSize, _grid[(int)_bufferSwap], _pointSource, _sigPoint));
+		updatePoint<<<1, 1>>>(_gridSize, _grid[(int)_bufferSwap], _pointSource, _sigPoint);
 		cudaDeviceSynchronize();
+		CudaCheckError();
 	}
 
-	checkCudaErrors(updateColors<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap],
-												_vertexPointer));
-
+	updateColors<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap], _vertexPointer);
 	cudaDeviceSynchronize();
+	CudaCheckError();
 
-	checkCudaErrors(cudaGraphicsUnmapResources(1, &_cudaVboRes, 0));
+	CudaSafeCall(cudaGraphicsUnmapResources(1, &_cudaVboRes, 0));
 
 	++_nPoint;
 
