@@ -20,12 +20,12 @@ AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 
 	for(unsigned int i = 0; i < 2; ++i)
 	{
-		cudaMalloc((void **)&_grid[i], (gridSize.x + 1) * (gridSize.y + 1) * sizeof(SpacePoint));
-		cudaMemset(_grid[i], 0, (gridSize.x + 1) * (gridSize.y + 1) * sizeof(SpacePoint));
-		cudaMalloc((void **)&_murX[i], gridSize.y * 4 * sizeof(float));
-		cudaMemset(_murX[i], 0, gridSize.y * 4 * sizeof(float));
-		cudaMalloc((void **)&_murY[i], gridSize.x * 4 * sizeof(float));
-		cudaMemset(_murY[i], 0, gridSize.x * 4 * sizeof(float));
+		CudaSafeCall(cudaMalloc((void **)&_grid[i], (gridSize.x + 1) * (gridSize.y + 1) * sizeof(SpacePoint)));
+		CudaSafeCall(cudaMemset(_grid[i], 0, (gridSize.x + 1) * (gridSize.y + 1) * sizeof(SpacePoint)));
+		CudaSafeCall(cudaMalloc((void **)&_murX[i], gridSize.y * 4 * sizeof(float)));
+		CudaSafeCall(cudaMemset(_murX[i], 0, gridSize.y * 4 * sizeof(float)));
+		CudaSafeCall(cudaMalloc((void **)&_murY[i], gridSize.x * 4 * sizeof(float)));
+		CudaSafeCall(cudaMemset(_murY[i], 0, gridSize.x * 4 * sizeof(float)));
 	}
 }
 
@@ -33,9 +33,9 @@ AcousticFDTD::~AcousticFDTD()
 {
 	CudaSafeCall(cudaGraphicsUnregisterResource(_cudaVboRes));
 
-	cudaFree(_grid[0]); cudaFree(_grid[1]);
-	cudaFree(_murX[0]); cudaFree(_murX[1]);
-	cudaFree(_murY[0]); cudaFree(_murY[1]);
+	CudaSafeCall(cudaFree(_grid[0]); cudaFree(_grid[1]));
+	CudaSafeCall(cudaFree(_murX[0]); cudaFree(_murX[1]));
+	CudaSafeCall(cudaFree(_murY[0]); cudaFree(_murY[1]));
 }
 
 __global__ void updateV(glm::ivec2 dataPerThread, glm::ivec2 gridSize, AcousticFDTD::SpacePoint * inGrid,
@@ -94,7 +94,7 @@ __global__ void mur2nd(glm::ivec2 dataPerThread, glm::ivec2 gridSize, AcousticFD
 	float v = sqrt(bulkModulus/density);	// Wave velocity
 	int i,j;
 	/////
-	outGrid[0].soundPressure = 0.f;
+	outGrid[0 * gridSize.y + j].soundPressure = murX[0][0];
 
 //	for(i = startI < 2 ? 2 : startI; i < rangeI; ++i){
 //		outGrid[(i * gridSize.y)].soundPressure = - murY[1][(i * 4 + 1)]
@@ -128,9 +128,9 @@ __global__ void mur2nd(glm::ivec2 dataPerThread, glm::ivec2 gridSize, AcousticFD
 //		                                                               + murX[0][3 + (j-1) * 4] + murX[0][2 + (j+1) * 4]
 //		                                                               - 2.0 * murX[0][2 + j * 4] + murX[0][2 + (j-1) * 4] );
 //	}
-
-	// corners are computed by first thread:
-	// Mur's 1st Order Absorption for 4 corners
+//
+//	 corners are computed by first thread:
+//	 Mur's 1st Order Absorption for 4 corners
 //	if(startI == 0)
 //	{
 //		i = 1;
