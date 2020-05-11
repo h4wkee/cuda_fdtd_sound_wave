@@ -31,6 +31,8 @@ CUDA_COMPILE(cuda_o src/AcousticFDTD.cu)
 #file(GLOB_RECURSE SRC_FILES src/*.cpp src/*.cu)
 file(GLOB_RECURSE SRC_FILES src/*.cpp)
 
+link_directories("/home/student/165095/")
+
 #cuda_add_executable(cuda_fdtd_sound_wave ${SRC_FILES})
 add_executable(cuda_fdtd_sound_wave ${SRC_FILES} ${cuda_o})
 
