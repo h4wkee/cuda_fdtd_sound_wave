@@ -33,9 +33,12 @@ AcousticFDTD::~AcousticFDTD()
 {
 	CudaSafeCall(cudaGraphicsUnregisterResource(_cudaVboRes));
 
-	CudaSafeCall(cudaFree(_grid[0])); CudaSafeCall(cudaFree(_grid[1])));
-	CudaSafeCall(cudaFree(_murX[0])); CudaSafeCall(cudaFree(_murX[1])));
-	CudaSafeCall(cudaFree(_murY[0])); CudaSafeCall(cudaFree(_murY[1])));
+	CudaSafeCall(cudaFree(_grid[0]));
+	CudaSafeCall(cudaFree(_grid[1]));
+	CudaSafeCall(cudaFree(_murX[0]));
+	CudaSafeCall(cudaFree(_murX[1]));
+	CudaSafeCall(cudaFree(_murY[0]));
+	CudaSafeCall(cudaFree(_murY[1]));
 }
 
 __global__ void updateV(glm::ivec2 dataPerThread, glm::ivec2 gridSize, AcousticFDTD::SpacePoint * inGrid,
