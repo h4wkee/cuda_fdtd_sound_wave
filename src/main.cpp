@@ -77,6 +77,7 @@ int main(int argc, char * argv[])
 			}
 	};
 	Renderable surface(surfaceVertices, GL_TRIANGLES);
+	surface.initVAO();
 
 	std::vector<Vertex> pointsVertices;
 	pointsVertices.resize(gridSize.x * gridSize.y);
@@ -96,6 +97,7 @@ int main(int argc, char * argv[])
 	Renderable points{pointsVertices, GL_POINTS, pointSize};
 	GLuint * vbo = points.getVBO();
 	AcousticFDTD fdtd(gridSize, vbo);
+	points.initVAO();
 
 	/////////////////
 

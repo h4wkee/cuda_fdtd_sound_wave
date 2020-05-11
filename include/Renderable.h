@@ -16,6 +16,7 @@ public:
 
 	void draw();
 	void init(std::vector<Vertex> & vertices, GLenum type = GL_POINTS, float pointSize = 1.f);
+	void initVAO();
 
 	GLuint * getVBO() { return & _vbo; }
 

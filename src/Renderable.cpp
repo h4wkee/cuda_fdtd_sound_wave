@@ -45,6 +45,7 @@ void Renderable::draw()
 
 void Renderable::init(std::vector<Vertex> & vertices, GLenum type, float pointSize)
 {
+	glPointSize(pointSize);
 	glGenBuffers(1, &_vbo);
 	_vertexCount = vertices.size();
 	_type = type;
@@ -57,9 +58,10 @@ void Renderable::init(std::vector<Vertex> & vertices, GLenum type, float pointSi
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	//checkCudaErrors(cudaGraphicsGLRegisterBuffer(&_vertexPointer, _vbo, cudaGraphicsMapFlagsNone));
+}
 
-	glPointSize(pointSize);
-
+void Renderable::initVAO()
+{
 	glGenVertexArrays(1, &_vao);
 
 	glBindVertexArray(_vao);
@@ -75,5 +77,4 @@ void Renderable::init(std::vector<Vertex> & vertices, GLenum type, float pointSi
 	glEnableVertexAttribArray(1);
 
 	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
