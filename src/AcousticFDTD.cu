@@ -8,6 +8,7 @@ const int CUDA_THREADS_Y = 256;
 AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 {
 	_gridSize = gridSize;
+	cudaSetDevice(0);
 
 	std::cout << "VBO: " << *vbo << std::endl;
 	cudaError_t eError = cudaGraphicsGLRegisterBuffer(&_cudaVboRes, *vbo, cudaGraphicsMapFlagsNone);
