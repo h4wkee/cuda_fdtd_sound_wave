@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.12)
 project(cuda_fdtd_sound_wave LANGUAGES CXX CUDA)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -9,9 +9,10 @@ endif()
 
 find_package(OpenGL)
 find_package(CUDA REQUIRED)
-set(CUDA_SEPARABLE_COMPILATION ON)
-set(CUDA_PROPAGATE_HOST_FLAGS OFF)
-set(CUDA_HOST_COMPILER g++)
+set(CUDA_SEPARABLE_COMPILATION OFF)
+set(CUDA_PROPAGATE_HOST_FLAGS ON)
+
+
 
 include_directories(
         include
@@ -23,20 +24,20 @@ include_directories(
         ${CUDA_HOME}/samples/common/inc/
 )
 
-link_directories("/home/student/165095/")
-
 add_subdirectory(dependencies/glad)
-#add_subdirectory(dependencies/glfw)
+add_subdirectory(dependencies/glfw)
 add_subdirectory(dependencies/glm)
 
-#CUDA_COMPILE(cuda_o src/AcousticFDTD.cu)
+CUDA_COMPILE(cuda_o src/AcousticFDTD.cu)
 
-file(GLOB_RECURSE SRC_FILES src/*.cpp src/*.cu)
+#file(GLOB_RECURSE SRC_FILES src/*.cpp src/*.cu)
+file(GLOB_RECURSE SRC_FILES src/*.cpp)
 
-cuda_add_executable(cuda_fdtd_sound_wave ${SRC_FILES})
+#cuda_add_executable(cuda_fdtd_sound_wave ${SRC_FILES})
+add_executable(cuda_fdtd_sound_wave ${SRC_FILES} ${cuda_o})
 
-#add_dependencies(cuda_fdtd_sound_wave glad glfw glm)
-add_dependencies(cuda_fdtd_sound_wave glad glm)
+add_dependencies(cuda_fdtd_sound_wave glad glfw glm)
+#add_dependencies(cuda_fdtd_sound_wave glad glm)
 
 target_link_libraries(cuda_fdtd_sound_wave glad glfw glm ${OPENGL_gl_LIBRARY} ${CUDART_LIBRARY})
 

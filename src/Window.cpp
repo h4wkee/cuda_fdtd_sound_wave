@@ -82,7 +82,7 @@ bool Window::_init(int width, int height)
 	// store pointer to Window in GLFW window for later use
 	glfwSetWindowUserPointer(_window, this);
 
-	glfwMaximizeWindow(_window);
+	//glfwMaximizeWindow(_window);
 
 	glClear(GL_COLOR_BUFFER_BIT);
 	glfwSwapBuffers(_window);

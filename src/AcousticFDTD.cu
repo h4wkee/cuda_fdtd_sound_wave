@@ -1,9 +1,10 @@
 #include "AcousticFDTD.h"
 
-#include <cmath>
+#define _USE_MATH_DEFINES
+#include <math.h>
 
-const int CUDA_THREADS_X = 256;
-const int CUDA_THREADS_Y = 256;
+const int CUDA_THREADS_X = 10;
+const int CUDA_THREADS_Y = 10;
 
 AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 {
@@ -13,7 +14,10 @@ AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 	std::cout << "VBO: " << *vbo << std::endl;
 	cudaError_t eError = cudaGraphicsGLRegisterBuffer(&_cudaVboRes, *vbo, cudaGraphicsMapFlagsNone);
 	//cudaError_t eError = cudaGLRegisterBufferObject(*vbo);
-	printf("CUDA error: %s\n", cudaGetErrorString(eError));
+	if(eError)
+	{
+		printf("CUDA error: %s\n", cudaGetErrorString(eError));
+	}
 	//_vbo = *vbo;
 
 	_cudaBlockSize = dim3(CUDA_THREADS_X, CUDA_THREADS_Y);
@@ -191,10 +195,12 @@ __global__ void mur2ndCopy(glm::ivec2 dataPerThread, glm::ivec2 gridSize, Acoust
 	}
 }
 
-__global__ void updateColors(glm::ivec2 dataPerThread, glm::ivec2 gridSize, AcousticFDTD::SpacePoint * grid, glm::vec3 * vertexPointer)
+__global__ void updateColors(glm::ivec2 dataPerThread, glm::ivec2 gridSize, AcousticFDTD::SpacePoint * grid, Vertex * vertexPointer)
 {
 	const int startI = blockIdx.x * blockDim.x + threadIdx.x;
 	const int startJ = blockIdx.y * blockDim.y + threadIdx.y;
+
+	
 
 	unsigned int rangeI = (startI + dataPerThread.x) < gridSize.x ? (startI + dataPerThread.x) : gridSize.x;
 	unsigned int rangeJ = (startJ + dataPerThread.y) < gridSize.y ? (startJ + dataPerThread.y) : gridSize.y;
@@ -204,10 +210,19 @@ __global__ void updateColors(glm::ivec2 dataPerThread, glm::ivec2 gridSize, Acou
 	{
 		for(unsigned int j = startJ; j < rangeJ; ++j)
 		{
+			if(i >= 10 || j >= 10)
+			{
+				continue;
+			}
 			float amplifier = 100.f;
 			float grayScale = abs(grid[i * gridSize.y + j].soundPressure) * amplifier;
+			Vertex & v = vertexPointer[(i * gridSize.y * 2 + j)];
+			v.color = { 0.9, 1.0, 0.0, 0.0 };
+			Vertex & v2 = vertexPointer[2 * (i * gridSize.y + j)];
+			v2.color = { 0.9, 1.0, 0.0, 0.0 };
 			// 2 * index + 1 because vbo consists of 2 vec3 (position and color)
-			vertexPointer[2 * (i * gridSize.y + j) + 1] = {grayScale, grayScale, grayScale};
+			//vertexPointer[2 * (i * gridSize.y + j) + 1] = { grayScale, grayScale, grayScale };
+			//vertexPointer[1 * (i * gridSize.y + j) + 1] = {0.5, 1.0, 0.0};
 		}
 	}
 }
@@ -220,27 +235,54 @@ __global__ void updatePoint(glm::ivec2 gridSize, AcousticFDTD::SpacePoint * grid
 void AcousticFDTD::draw()
 {
 	cudaError_t eError = cudaGraphicsMapResources(1, &_cudaVboRes, 0);
-	printf("CUDA error: %s\n", cudaGetErrorString(eError));
+	if(eError)
+	{
+		printf("CUDA error: %s\n", cudaGetErrorString(eError));
+	}
 	size_t size;
 	cudaGraphicsResourceGetMappedPointer((void **)(&_vertexPointer), &size, _cudaVboRes);
-
+	eError = cudaGetLastError();
+	if(eError)
+	{
+		printf("CUDA error: %s\n", cudaGetErrorString(eError));
+	}
 	//cudaError_t eError = cudaGLMapBufferObject((void **)&_vertexPointer, _vbo);
 	//printf("CUDA error: %s\n", cudaGetErrorString(eError));
 
 	updateV<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)!_bufferSwap],
 												_grid[(int)_bufferSwap], _dtOverDx, _density);
 	cudaDeviceSynchronize();
+	eError = cudaGetLastError();
+	if(eError)
+	{
+		printf("CUDA error: %s\n", cudaGetErrorString(eError));
+	}
 
 	updateP<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)!_bufferSwap],
 												_grid[(int)_bufferSwap], _dtOverDx, _bulkModulus);
 	cudaDeviceSynchronize();
+	eError = cudaGetLastError();
+	if(eError)
+	{
+		printf("CUDA error: %s\n", cudaGetErrorString(eError));
+	}
 
-	mur2nd<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)!_bufferSwap],
-												_grid[(int)_bufferSwap], _murX, _murY, _dt, _dx, _density, _bulkModulus);
+	//mur2nd<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)!_bufferSwap],
+	//											_grid[(int)_bufferSwap], _murX, _murY, _dt, _dx, _density, _bulkModulus);
 	cudaDeviceSynchronize();
+	eError = cudaGetLastError();
+	if(eError)
+	{
+		printf("CUDA error: %s\n", cudaGetErrorString(eError));
+	}
 	//copy previous values
-	mur2ndCopy<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap], _murX, _murY);
-
+	//mur2ndCopy<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap], _murX, _murY);
+	cudaDeviceSynchronize();
+	eError = cudaGetLastError();
+	if(eError)
+	{
+		printf("CUDA error: %s\n", cudaGetErrorString(eError));
+	}
 	/* Initial Waveform from a Point Source (1 pulse of sinusoidal wave with Hann window) */
 	if( _nPoint < (1.0/_freq)/_dt ){
 		_sigPoint = (1.0-cos((2.0*M_PI*_freq*_nPoint*_dt)))/2.0 * sin((2.0*M_PI*_freq*_nPoint*_dt));
@@ -248,9 +290,15 @@ void AcousticFDTD::draw()
 		cudaDeviceSynchronize();
 	}
 
-	//updateColors<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap], _vertexPointer);
+	updateColors<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap], _vertexPointer);
 
 	cudaDeviceSynchronize();
+	eError = cudaGetLastError();
+	if(eError)
+	{
+		printf("CUDA error: %s\n", cudaGetErrorString(eError));
+	}
+
 
 	cudaGraphicsUnmapResources(1, &_cudaVboRes, 0);
 	//cudaGLUnmapBufferObject(_vbo);

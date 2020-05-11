@@ -5,16 +5,18 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "Vertex.h"
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <cuda_gl_interop.h>
 //#include <helper_cuda.h>
 //#include <helper_cuda_gl.h>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/vector_angle.hpp>
+#define GLM_FORCE_CUDA
+#include "../dependencies/glm/glm/glm.hpp"
+#include "../dependencies/glm/glm/gtc/matrix_transform.hpp"
+#include "../dependencies/glm/glm/gtc/type_ptr.hpp"
+#include "../dependencies/glm/glm/gtx/vector_angle.hpp"
 
 class AcousticFDTD
 {
@@ -50,7 +52,7 @@ private:
 	float _bulkModulus = 142.0e3;	// [Pa]
 	float _freq = 1.0e3;    // Frequency of Initial Waveform [Hz]
 
-	glm::vec3 * _vertexPointer;
+	Vertex * _vertexPointer;
 	struct cudaGraphicsResource * _cudaVboRes;
 	//GLuint _vbo;
 	bool _bufferSwap = 0;
