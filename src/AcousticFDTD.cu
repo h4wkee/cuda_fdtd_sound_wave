@@ -198,16 +198,10 @@ __global__ void updateColors(glm::ivec2 dataPerThread, glm::ivec2 gridSize, Acou
 	{
 		for(unsigned int j = startJ; j < rangeJ; ++j)
 		{
-			if(i >= 10 || j >= 10)
-			{
-				continue;
-			}
 			float amplifier = 100.f;
 			float grayScale = abs(grid[i * gridSize.y + j].soundPressure) * amplifier;
-			Vertex & v = vertexPointer[(i * gridSize.y * 2 + j)];
+			Vertex & v = vertexPointer[(i * gridSize.y + j)];
 			v.color = { 0.9, 1.0, 0.0, 0.0 };
-			Vertex & v2 = vertexPointer[2 * (i * gridSize.y + j)];
-			v2.color = { 0.9, 1.0, 0.0, 0.0 };
 			// 2 * index + 1 because vbo consists of 2 vec3 (position and color)
 			//vertexPointer[2 * (i * gridSize.y + j) + 1] = { grayScale, grayScale, grayScale };
 			//vertexPointer[1 * (i * gridSize.y + j) + 1] = {0.5, 1.0, 0.0};

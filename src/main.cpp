@@ -52,28 +52,28 @@ int main(int argc, char * argv[])
 
 	std::vector<Vertex> surfaceVertices = {
 			{
-				{-1.f * surfaceScale, 1.f * surfaceScale, 1.f, 0.0},
-				{surfaceColor.x, surfaceColor.y, surfaceColor.z, 0.0 }
+				{-1.f * surfaceScale, 1.f * surfaceScale, 1.f },
+				{surfaceColor.x, surfaceColor.y, surfaceColor.z }
 			},
 			{
-				{1.f * surfaceScale, 1.f * surfaceScale,1.f, 0.0 },
-				{surfaceColor.x, surfaceColor.y, surfaceColor.z, 0.0 }
+				{1.f * surfaceScale, 1.f * surfaceScale,1.f },
+				{surfaceColor.x, surfaceColor.y, surfaceColor.z }
 			},
 			{
-				{1.f * surfaceScale, -1.f * surfaceScale, 1.f, 0.0 },
-				{surfaceColor.x, surfaceColor.y, surfaceColor.z, 0.0 }
+				{1.f * surfaceScale, -1.f * surfaceScale, 1.f },
+				{surfaceColor.x, surfaceColor.y, surfaceColor.z }
 			},
 			{
-				{1.f * surfaceScale, -1.f * surfaceScale, 1.f, 0.0 },
-				{surfaceColor.x, surfaceColor.y, surfaceColor.z, 0.0 }
+				{1.f * surfaceScale, -1.f * surfaceScale, 1.f },
+				{surfaceColor.x, surfaceColor.y, surfaceColor.z }
 			},
 			{
-				{-1.f * surfaceScale, -1.f * surfaceScale, 1.f, 0.0 },
-				{surfaceColor.x, surfaceColor.y, surfaceColor.z, 0.0 }
+				{-1.f * surfaceScale, -1.f * surfaceScale, 1.f },
+				{surfaceColor.x, surfaceColor.y, surfaceColor.z }
 			},
 			{
-				{-1.f * surfaceScale, 1.f * surfaceScale, 1.f, 0.0 },
-				{surfaceColor.x, surfaceColor.y, surfaceColor.z, 0.0 }
+				{-1.f * surfaceScale, 1.f * surfaceScale, 1.f },
+				{surfaceColor.x, surfaceColor.y, surfaceColor.z }
 			}
 	};
 	Renderable surface(surfaceVertices, GL_TRIANGLES);
@@ -87,8 +87,8 @@ int main(int argc, char * argv[])
 		for(unsigned j = 0; j < gridSize.y; ++j)
 		{
 			pointsVertices.push_back({
-				{i * resolution + base.x, j * resolution + base.y, 1.f, 1.0 },
-				{1.f, 1.f, 1.f, 1.0 }
+				{i * resolution + base.x, j * resolution + base.y, 1.f },
+				{1.f, 1.f, 1.f }
 			});
 		}
 	}
