@@ -17,7 +17,7 @@ include_directories(
         dependencies
         dependencies/glad/include
         dependencies/glfw/include
-        dependencies/glm/include
+        dependencies/glm
         ${CUDA_INCLUDE_DIRS}
         ${CUDA_HOME}/samples/common/inc/
 )

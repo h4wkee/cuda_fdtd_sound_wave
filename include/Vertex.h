@@ -4,7 +4,8 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 #define GLM_FORCE_CUDA
-#include "../dependencies/glm/glm/glm.hpp"
+//#include "../dependencies/glm/glm/glm.hpp"
+#include <glm/glm.hpp>
 
 struct Vertex
 {
