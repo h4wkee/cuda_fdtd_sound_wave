@@ -6,14 +6,10 @@
 #include <GLFW/glfw3.h>
 
 #include "Vertex.h"
+
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <cuda_gl_interop.h>
-//#include <helper_cuda.h>
-//#include <helper_cuda_gl.h>
-
-//#define GLM_FORCE_CUDA
-//#include "../dependencies/glm/glm/glm.hpp"
 
 class AcousticFDTD
 {

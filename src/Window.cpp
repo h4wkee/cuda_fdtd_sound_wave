@@ -37,22 +37,14 @@ bool Window::_init(int width, int height)
 
 	glfwSetErrorCallback(errorCallback);
 
-	GLFWmonitor * monitor = nullptr;
 	_width = width;
 	_height = height;
 
-	//glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-	//glfwWindowHint(GLFW_DECORATED, GLFW_TRUE);
-	//glfwWindowHint(GLFW_MAXIMIZED, GLFW_FALSE);
-
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	//glfwWindowHint(GLFW_SAMPLES, 0);
-	//glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_TRUE);
 
-	_window = glfwCreateWindow(_width, _height, "Cuda FDTD Sound Wave", monitor, nullptr);
+	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+	_window = glfwCreateWindow(_width, _height, "Cuda FDTD Sound Wave", nullptr, nullptr);
 
 	if (!_window)
 	{
@@ -62,7 +54,6 @@ bool Window::_init(int width, int height)
 	}
 
 	glfwMakeContextCurrent(_window);
-	//glfwSwapInterval(true); // vsync enabled
 
 	if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
 	{
@@ -82,13 +73,8 @@ bool Window::_init(int width, int height)
 	// store pointer to Window in GLFW window for later use
 	glfwSetWindowUserPointer(_window, this);
 
-	//glfwMaximizeWindow(_window);
-
 	glClear(GL_COLOR_BUFFER_BIT);
 	glfwSwapBuffers(_window);
-
-	// alpha blending
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glfwSetKeyCallback(_window, escCallback);
 	glfwSetFramebufferSizeCallback(_window, framebufferSizeCallback);

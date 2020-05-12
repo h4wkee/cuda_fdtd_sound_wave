@@ -10,7 +10,7 @@ AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 	_gridSize = gridSize;
 	_dataPerThread = glm::vec2(1, 1);
 
-	//CudaSafeCall(cudaGraphicsGLRegisterBuffer(&_cudaVboRes, *vbo, cudaGraphicsMapFlagsNone));
+	CudaSafeCall(cudaGraphicsGLRegisterBuffer(&_cudaVboRes, *vbo, cudaGraphicsMapFlagsNone));
 
 	//_cudaBlockSize = dim3(gridSize.x / _dataPerThread.x, gridSize.y / _dataPerThread.y);
 	_cudaBlockSize = dim3(32, 32);
@@ -206,11 +206,7 @@ __global__ void updateColors(glm::ivec2 dataPerThread, glm::ivec2 gridSize, Acou
 			float amplifier = 100.f;
 			float grayScale = abs(grid[i * gridSize.y + j].soundPressure) * amplifier;
 			Vertex & v = vertexPointer[(i * gridSize.y + j)];
-			//v.color = { 0.9, 1.0, 0.0 };
-			v.color = { grayScale, grayScale, grayScale };
-			// 2 * index + 1 because vbo consists of 2 vec3 (position and color)
-			//vertexPointer[2 * (i * gridSize.y + j) + 1] = { grayScale, grayScale, grayScale };
-			//vertexPointer[1 * (i * gridSize.y + j) + 1] = {0.5, 1.0, 0.0};
+			v.color = { grayScale, grayScale, 1.f };
 		}
 	}
 }
@@ -222,9 +218,9 @@ __global__ void updatePoint(glm::ivec2 gridSize, AcousticFDTD::SpacePoint * grid
 
 void AcousticFDTD::draw()
 {
-//	CudaSafeCall(cudaGraphicsMapResources(1, &_cudaVboRes, 0));
-//	size_t size;
-//	CudaSafeCall(cudaGraphicsResourceGetMappedPointer((void **)(&_vertexPointer), &size, _cudaVboRes));
+	CudaSafeCall(cudaGraphicsMapResources(1, &_cudaVboRes, 0));
+	size_t size;
+	CudaSafeCall(cudaGraphicsResourceGetMappedPointer((void **)(&_vertexPointer), &size, _cudaVboRes));
 
 	updateV<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)!_bufferSwap],
 												_grid[(int)_bufferSwap], _dtOverDx, _density);
@@ -256,11 +252,11 @@ void AcousticFDTD::draw()
 		CudaCheckError();
 	}
 
-	//updateColors<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap], _vertexPointer);
-	//cudaDeviceSynchronize();
-	//CudaCheckError();
+	updateColors<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap], _vertexPointer);
+	cudaDeviceSynchronize();
+	CudaCheckError();
 
-//	CudaSafeCall(cudaGraphicsUnmapResources(1, &_cudaVboRes, 0));
+	CudaSafeCall(cudaGraphicsUnmapResources(1, &_cudaVboRes, 0));
 
 	++_nPoint;
 
