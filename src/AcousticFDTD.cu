@@ -145,7 +145,7 @@ __global__ void mur2nd(glm::ivec2 dataPerThread, glm::ivec2 gridSize, AcousticFD
 
 	 // corners are computed by first thread:
 	 // Mur's 1st Order Absorption for 4 corners
-	if(startI == 0)
+	if(true)
 	{
 		i = 1;
 		outGrid[i * gridSize.y].soundPressure = murY1[i * 4 + 1] + (v*dt-dx)/(v*dt+dx) * (inGrid[i * gridSize.y + 1].soundPressure - murY1[i * 4]);
@@ -154,7 +154,7 @@ __global__ void mur2nd(glm::ivec2 dataPerThread, glm::ivec2 gridSize, AcousticFD
 		outGrid[i * gridSize.y].soundPressure = murY1[i * 4 + 1] + (v*dt-dx)/(v*dt+dx) * (inGrid[i* gridSize.y + 1].soundPressure - murY1[i * 4]);
 		outGrid[i * gridSize.y + gridSize.y-1].soundPressure = murY1[i * 4 + 2] + (v*dt-dx)/(v*dt+dx) * (inGrid[i * gridSize.y + gridSize.y-2].soundPressure - murY1[i * 4 + 3]);
 	}
-	if(startJ == 0)
+	if(true)
 	{
 		j = 1;
 		outGrid[0 * gridSize.y + j].soundPressure = murX1[1 + j * 4] + (v*dt-dx)/(v*dt+dx) * (inGrid[1 * gridSize.y + j].soundPressure - murX1[0 + j * 4]);
