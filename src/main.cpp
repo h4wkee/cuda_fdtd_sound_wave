@@ -54,7 +54,7 @@ int main(int argc, char * argv[])
 	float renderPadding = 0.1f;
 	glClearColor(0.33f, 0.33f, 0.33f, 1.f);
 
-	Shader shader("solid_color");
+	Shader * shader = new Shader("solid_color");
 	//glm::mat4 projection = glm::ortho(0.0f, windowWidth, 0.0f, windowHeight, 0.1f, 100.f);
 	glm::mat4 projection = glm::perspective(glm::radians(45.f), windowWidth / windowHeight, 0.1f, 100.f);
 	glm::mat4 view = view = glm::lookAt(glm::vec3(0.0f, -10.0f, -10.0f),glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -122,9 +122,9 @@ int main(int argc, char * argv[])
 
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(appTime - appStart).count();
 
-		shader.setUniform4m("projection", glm::value_ptr(projection));
-		shader.setUniform4m("view", glm::value_ptr(view));
-		shader.setUniform4m("model", glm::value_ptr(model));
+		shader->setUniform4m("projection", glm::value_ptr(projection));
+		shader->setUniform4m("view", glm::value_ptr(view));
+		shader->setUniform4m("model", glm::value_ptr(model));
 
 		surface->draw();
 
@@ -136,6 +136,7 @@ int main(int argc, char * argv[])
 	delete fdtd;
 	delete points;
 	delete surface;
+	delete shader;
 	window.close();
 	return 0;
 }

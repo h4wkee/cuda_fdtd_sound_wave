@@ -142,28 +142,27 @@ __global__ void mur2nd(glm::ivec2 dataPerThread, glm::ivec2 gridSize, AcousticFD
 		                                                               + murX1[3 + (j-1) * 4] + murX1[2 + (j+1) * 4]
 		                                                               - 2.0 * murX1[2 + j * 4] + murX1[2 + (j-1) * 4] );
 	}
-}
-
-__global__ void mur2ndCorners(glm::ivec2 gridSize, AcousticFDTD::SpacePoint * inGrid, AcousticFDTD::SpacePoint * outGrid,
-                       float * murX1, float * murX2, float * murY1, float * murY2, float dt, float dx, float density, float bulkModulus)
-{
-	int i, j;
-	float v = sqrt(bulkModulus/density);	// Wave velocity
 
 	// Mur's 1st Order Absorption for 4 corners
-	i = 1;
-	outGrid[i * gridSize.y].soundPressure = murY1[i * 4 + 1] + (v*dt-dx)/(v*dt+dx) * (inGrid[i * gridSize.y + 1].soundPressure - murY1[i * 4]);
-	outGrid[i * gridSize.y + gridSize.y-1].soundPressure = murY1[i * 4 + 2] + (v*dt-dx)/(v*dt+dx) * (inGrid[i * gridSize.y + gridSize.y-2].soundPressure - murY1[i * 4 + 3]);
-	i = gridSize.x-2;
-	outGrid[i * gridSize.y].soundPressure = murY1[i * 4 + 1] + (v*dt-dx)/(v*dt+dx) * (inGrid[i* gridSize.y + 1].soundPressure - murY1[i * 4]);
-	outGrid[i * gridSize.y + gridSize.y-1].soundPressure = murY1[i * 4 + 2] + (v*dt-dx)/(v*dt+dx) * (inGrid[i * gridSize.y + gridSize.y-2].soundPressure - murY1[i * 4 + 3]);
-
-	j = 1;
-	outGrid[0 * gridSize.y + j].soundPressure = murX1[1 + j * 4] + (v*dt-dx)/(v*dt+dx) * (inGrid[1 * gridSize.y + j].soundPressure - murX1[0 + j * 4]);
-	outGrid[(gridSize.x-1) * gridSize.y + j].soundPressure = murX1[2 + j * 4] + (v*dt-dx)/(v*dt+dx) * (inGrid[(gridSize.x-2) * gridSize.y + j].soundPressure - murX1[3 + j * 4]);
-	j = gridSize.y - 2;
-	outGrid[0 * gridSize.y + j].soundPressure = murX1[1 + j * 4] + (v*dt-dx)/(v*dt+dx) * (inGrid[1 * gridSize.y + j].soundPressure - murX1[0 + j * 4]);
-	outGrid[(gridSize.x-1) * gridSize.y + j].soundPressure = murX1[2+ j * 4] + (v*dt-dx)/(v*dt+dx) * (inGrid[(gridSize.x-2) * gridSize.y + j].soundPressure - murX1[3 + j * 4]);
+	// computed by first thread
+	if(startI == 0)
+	{
+		i = 1;
+		outGrid[i * gridSize.y].soundPressure = murY1[i * 4 + 1] + (v*dt-dx)/(v*dt+dx) * (inGrid[i * gridSize.y + 1].soundPressure - murY1[i * 4]);
+		outGrid[i * gridSize.y + gridSize.y-1].soundPressure = murY1[i * 4 + 2] + (v*dt-dx)/(v*dt+dx) * (inGrid[i * gridSize.y + gridSize.y-2].soundPressure - murY1[i * 4 + 3]);
+		i = gridSize.x-2;
+		outGrid[i * gridSize.y].soundPressure = murY1[i * 4 + 1] + (v*dt-dx)/(v*dt+dx) * (inGrid[i* gridSize.y + 1].soundPressure - murY1[i * 4]);
+		outGrid[i * gridSize.y + gridSize.y-1].soundPressure = murY1[i * 4 + 2] + (v*dt-dx)/(v*dt+dx) * (inGrid[i * gridSize.y + gridSize.y-2].soundPressure - murY1[i * 4 + 3]);
+	}
+	if(startJ == 0)
+	{
+		j = 1;
+		outGrid[0 * gridSize.y + j].soundPressure = murX1[1 + j * 4] + (v*dt-dx)/(v*dt+dx) * (inGrid[1 * gridSize.y + j].soundPressure - murX1[0 + j * 4]);
+		outGrid[(gridSize.x-1) * gridSize.y + j].soundPressure = murX1[2 + j * 4] + (v*dt-dx)/(v*dt+dx) * (inGrid[(gridSize.x-2) * gridSize.y + j].soundPressure - murX1[3 + j * 4]);
+		j = gridSize.y - 2;
+		outGrid[0 * gridSize.y + j].soundPressure = murX1[1 + j * 4] + (v*dt-dx)/(v*dt+dx) * (inGrid[1 * gridSize.y + j].soundPressure - murX1[0 + j * 4]);
+		outGrid[(gridSize.x-1) * gridSize.y + j].soundPressure = murX1[2+ j * 4] + (v*dt-dx)/(v*dt+dx) * (inGrid[(gridSize.x-2) * gridSize.y + j].soundPressure - murX1[3 + j * 4]);
+	}
 }
 
 __global__ void mur2ndCopy(glm::ivec2 dataPerThread, glm::ivec2 gridSize, AcousticFDTD::SpacePoint * grid,
@@ -249,11 +248,6 @@ void AcousticFDTD::draw()
 	mur2nd<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap],
 												_grid[(int)_bufferSwap], _murX[0], _murX[1], _murY[0], _murY[1],
 												_dt, _dx, _density, _bulkModulus);
-	cudaDeviceSynchronize();
-	CudaCheckError();
-
-	mur2ndCorners<<<1, 1>>>(_gridSize, _grid[(int)_bufferSwap],_grid[(int)_bufferSwap],
-												_murX[0], _murX[1], _murY[0], _murY[1], _dt, _dx, _density, _bulkModulus);
 	cudaDeviceSynchronize();
 	CudaCheckError();
 
