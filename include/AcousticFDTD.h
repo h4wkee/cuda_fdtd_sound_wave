@@ -14,9 +14,9 @@
 
 #define GLM_FORCE_CUDA
 #include "../dependencies/glm/glm/glm.hpp"
-#include "../dependencies/glm/glm/gtc/matrix_transform.hpp"
-#include "../dependencies/glm/glm/gtc/type_ptr.hpp"
-#include "../dependencies/glm/glm/gtx/vector_angle.hpp"
+//#include "../dependencies/glm/glm/gtc/matrix_transform.hpp"
+//#include "../dependencies/glm/glm/gtc/type_ptr.hpp"
+//#include "../dependencies/glm/glm/gtx/vector_angle.hpp"
 
 class AcousticFDTD
 {
