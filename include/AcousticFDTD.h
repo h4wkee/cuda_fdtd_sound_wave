@@ -41,8 +41,8 @@ private:
 	float _sigPoint = 0.f;
 
 	SpacePoint * _grid[2];
-	float * _murX[2];
-	float * _murY[2];
+	float ** _murX;
+	float ** _murY;
 
 	float _dx = 10.0e-3;    // Spatial Resolution [m/space_point]
 	float _dt = 15.0e-6;    // Temporal Resolution [s/step]

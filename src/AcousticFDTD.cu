@@ -18,6 +18,8 @@ AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
 	const int by = (gridSize.y + _cudaBlockSize.y - 1) / _cudaBlockSize.y;
 	_cudaGridSize = dim3(bx, by);
 
+	CudaSafeCall(cudaMalloc((void **)&_murX, 2 * sizeof(float*)));
+	CudaSafeCall(cudaMalloc((void **)&_murY, 2 * sizeof(float*)));
 	for(unsigned int i = 0; i < 2; ++i)
 	{
 		CudaSafeCall(cudaMalloc((void **)&_grid[i], (gridSize.x + 1) * (gridSize.y + 1) * sizeof(SpacePoint)));
@@ -96,62 +98,60 @@ __global__ void mur2nd(glm::ivec2 dataPerThread, glm::ivec2 gridSize, AcousticFD
 
 	float v = sqrt(bulkModulus/density);	// Wave velocity
 	int i,j;
-	/////
-	outGrid[0].soundPressure = murX[0][0];
 
-//	for(i = startI < 2 ? 2 : startI; i < rangeI; ++i){
-//		outGrid[(i * gridSize.y)].soundPressure = - murY[1][(i * 4 + 1)]
-//		                                         + (v*dt-dx)/(v*dt+dx) * ( inGrid[(i * gridSize.y + 1)].soundPressure + murY[1][(i * 4)] )
-//		                                         + (2.0*dx)/(v*dt+dx) * ( murY[0][i * 4] + murY[0][i * 4 + 1] )
-//		                                         + (dx*v*v*dt*dt)/(2.0*dx*dx*(v*dt+dx))
-//		                                           * ( murY[0][(i+1) * 4] - 2.0 * murY[0][i * 4]
-//		                                               + murY[0][(i-1) * 4] + murY[0][(i+1) * 4 + 1]
-//		                                               - 2.0 * murY[0][i* 4 + 1] + murY[0][(i-1) * 4 + 1] );
-//		outGrid[(i * gridSize.y) + (gridSize.y - 1)].soundPressure = - murY[1][(i * 4) + 2]
-//		                                                             + (v*dt-dx)/(v*dt+dx) * ( inGrid[(i * gridSize.y) + gridSize.y-2].soundPressure + murY[1][i * 4 + 3] )
-//		                                                             + (2.0*dx)/(v*dt+dx) * ( murY[0][i * 4 + 3] + murY[0][i * 4 + 2] )
-//		                                                             + (dx*v*v*dt*dt)/(2.0*dx*dx*(v*dt+dx))
-//		                                                               * ( murY[0][(i+1) * 4 + 3] - 2.0 * murY[0][i * 4 + 3]
-//		                                                                   + murY[0][(i-1) * 4 + 3] + murY[0][(i+1) * 4 + 2]
-//		                                                                   - 2.0 * murY[0][i * 4 + 2] + murY[0][(i-1) * 4 + 2] );
-//	}
-//	for(j = startJ < 2 ? 2 : startJ; j < rangeJ; ++j){
-//		outGrid[j].soundPressure = - murX[1][1 + j * 4]
-//		                         + (v*dt-dx)/(v*dt+dx) * ( inGrid[1 * gridSize.y + j].soundPressure + murX[1][0 + j * 4] )
-//		                         + (2.0*dx)/(v*dt+dx) * ( murX[0][0 + j * 4] + murX[0][1 + j * 4] )
-//		                         + (dx*v*v*dt*dt)/(2.0*dx*dx*(v*dt+dx))
-//		                           * ( murX[0][0 + (j+1) * 4] - 2.0 * murX[0][0 + j * 4]
-//		                               + murX[0][0 + (j-1) * 4] + murX[0][1 + (j+1) * 4]
-//		                               - 2.0 * murX[0][1 + j * 4] + murX[0][1 + (j-1) * 4] );
-//		outGrid[(gridSize.x-1) * gridSize.y + j].soundPressure = - murX[1][2 + j * 4]
-//		                                                         + (v*dt-dx)/(v*dt+dx) * ( inGrid[(gridSize.x-2) * gridSize.y + j].soundPressure + murX[1][3 + j * 4] )
-//		                                                         + (2.0*dx)/(v*dt+dx) * ( murX[0][3 + j * 4] + murX[0][2 + j * 4] )
-//		                                                         + (dx*v*v*dt*dt)/(2.0*dx*dx*(v*dt+dx))
-//		                                                           * ( murX[0][3 + (j+1) * 4] - 2.0 * murX[0][3 + j * 4]
-//		                                                               + murX[0][3 + (j-1) * 4] + murX[0][2 + (j+1) * 4]
-//		                                                               - 2.0 * murX[0][2 + j * 4] + murX[0][2 + (j-1) * 4] );
-//	}
-//
-//	 corners are computed by first thread:
-//	 Mur's 1st Order Absorption for 4 corners
-//	if(startI == 0)
-//	{
-//		i = 1;
-//		outGrid[i * gridSize.y].soundPressure = murY[0][i * 4 + 1] + (v*dt-dx)/(v*dt+dx) * (inGrid[i * gridSize.y + 1].soundPressure - murY[0][i * 4]);
-//		outGrid[i * gridSize.y + gridSize.y-1].soundPressure = murY[0][i * 4 + 2] + (v*dt-dx)/(v*dt+dx) * (inGrid[i * gridSize.y + gridSize.y-2].soundPressure - murY[0][i * 4 + 3]);
-//		i = gridSize.x-2;
-//		outGrid[i * gridSize.y].soundPressure = murY[0][i * 4 + 1] + (v*dt-dx)/(v*dt+dx) * (inGrid[i* gridSize.y + 1].soundPressure - murY[0][i * 4]);
-//		outGrid[i * gridSize.y + gridSize.y-1].soundPressure = murY[0][i * 4 + 2] + (v*dt-dx)/(v*dt+dx) * (inGrid[i * gridSize.y + gridSize.y-2].soundPressure - murY[0][i * 4 + 3]);
-//	}
-//	if(startJ == 0)
-//	{
-//		j = 1;
-//		outGrid[0 * gridSize.y + j].soundPressure = murX[0][1 + j * 4] + (v*dt-dx)/(v*dt+dx) * (inGrid[1 * gridSize.y + j].soundPressure - murX[0][0 + j * 4]);
-//		outGrid[(gridSize.x-1) * gridSize.y + j].soundPressure = murX[0][2 + j * 4] + (v*dt-dx)/(v*dt+dx) * (inGrid[(gridSize.x-2) * gridSize.y + j].soundPressure - murX[0][3 + j * 4]);
-//		j = gridSize.y - 2;
-//		outGrid[0 * gridSize.y + j].soundPressure = murX[0][1 + j * 4] + (v*dt-dx)/(v*dt+dx) * (inGrid[1 * gridSize.y + j].soundPressure - murX[0][0 + j * 4]);
-//		outGrid[(gridSize.x-1) * gridSize.y + j].soundPressure = murX[0][2+ j * 4] + (v*dt-dx)/(v*dt+dx) * (inGrid[(gridSize.x-2) * gridSize.y + j].soundPressure - murX[0][3 + j * 4]);
-//	}
+	for(i = startI < 2 ? 2 : startI; i < rangeI; ++i){
+		outGrid[(i * gridSize.y)].soundPressure = - murY[1][(i * 4 + 1)]
+		                                         + (v*dt-dx)/(v*dt+dx) * ( inGrid[(i * gridSize.y + 1)].soundPressure + murY[1][(i * 4)] )
+		                                         + (2.0*dx)/(v*dt+dx) * ( murY[0][i * 4] + murY[0][i * 4 + 1] )
+		                                         + (dx*v*v*dt*dt)/(2.0*dx*dx*(v*dt+dx))
+		                                           * ( murY[0][(i+1) * 4] - 2.0 * murY[0][i * 4]
+		                                               + murY[0][(i-1) * 4] + murY[0][(i+1) * 4 + 1]
+		                                               - 2.0 * murY[0][i* 4 + 1] + murY[0][(i-1) * 4 + 1] );
+		outGrid[(i * gridSize.y) + (gridSize.y - 1)].soundPressure = - murY[1][(i * 4) + 2]
+		                                                             + (v*dt-dx)/(v*dt+dx) * ( inGrid[(i * gridSize.y) + gridSize.y-2].soundPressure + murY[1][i * 4 + 3] )
+		                                                             + (2.0*dx)/(v*dt+dx) * ( murY[0][i * 4 + 3] + murY[0][i * 4 + 2] )
+		                                                             + (dx*v*v*dt*dt)/(2.0*dx*dx*(v*dt+dx))
+		                                                               * ( murY[0][(i+1) * 4 + 3] - 2.0 * murY[0][i * 4 + 3]
+		                                                                   + murY[0][(i-1) * 4 + 3] + murY[0][(i+1) * 4 + 2]
+		                                                                   - 2.0 * murY[0][i * 4 + 2] + murY[0][(i-1) * 4 + 2] );
+	}
+	for(j = startJ < 2 ? 2 : startJ; j < rangeJ; ++j){
+		outGrid[j].soundPressure = - murX[1][1 + j * 4]
+		                         + (v*dt-dx)/(v*dt+dx) * ( inGrid[1 * gridSize.y + j].soundPressure + murX[1][0 + j * 4] )
+		                         + (2.0*dx)/(v*dt+dx) * ( murX[0][0 + j * 4] + murX[0][1 + j * 4] )
+		                         + (dx*v*v*dt*dt)/(2.0*dx*dx*(v*dt+dx))
+		                           * ( murX[0][0 + (j+1) * 4] - 2.0 * murX[0][0 + j * 4]
+		                               + murX[0][0 + (j-1) * 4] + murX[0][1 + (j+1) * 4]
+		                               - 2.0 * murX[0][1 + j * 4] + murX[0][1 + (j-1) * 4] );
+		outGrid[(gridSize.x-1) * gridSize.y + j].soundPressure = - murX[1][2 + j * 4]
+		                                                         + (v*dt-dx)/(v*dt+dx) * ( inGrid[(gridSize.x-2) * gridSize.y + j].soundPressure + murX[1][3 + j * 4] )
+		                                                         + (2.0*dx)/(v*dt+dx) * ( murX[0][3 + j * 4] + murX[0][2 + j * 4] )
+		                                                         + (dx*v*v*dt*dt)/(2.0*dx*dx*(v*dt+dx))
+		                                                           * ( murX[0][3 + (j+1) * 4] - 2.0 * murX[0][3 + j * 4]
+		                                                               + murX[0][3 + (j-1) * 4] + murX[0][2 + (j+1) * 4]
+		                                                               - 2.0 * murX[0][2 + j * 4] + murX[0][2 + (j-1) * 4] );
+	}
+
+	 // corners are computed by first thread:
+	 // Mur's 1st Order Absorption for 4 corners
+	if(startI == 0)
+	{
+		i = 1;
+		outGrid[i * gridSize.y].soundPressure = murY[0][i * 4 + 1] + (v*dt-dx)/(v*dt+dx) * (inGrid[i * gridSize.y + 1].soundPressure - murY[0][i * 4]);
+		outGrid[i * gridSize.y + gridSize.y-1].soundPressure = murY[0][i * 4 + 2] + (v*dt-dx)/(v*dt+dx) * (inGrid[i * gridSize.y + gridSize.y-2].soundPressure - murY[0][i * 4 + 3]);
+		i = gridSize.x-2;
+		outGrid[i * gridSize.y].soundPressure = murY[0][i * 4 + 1] + (v*dt-dx)/(v*dt+dx) * (inGrid[i* gridSize.y + 1].soundPressure - murY[0][i * 4]);
+		outGrid[i * gridSize.y + gridSize.y-1].soundPressure = murY[0][i * 4 + 2] + (v*dt-dx)/(v*dt+dx) * (inGrid[i * gridSize.y + gridSize.y-2].soundPressure - murY[0][i * 4 + 3]);
+	}
+	if(startJ == 0)
+	{
+		j = 1;
+		outGrid[0 * gridSize.y + j].soundPressure = murX[0][1 + j * 4] + (v*dt-dx)/(v*dt+dx) * (inGrid[1 * gridSize.y + j].soundPressure - murX[0][0 + j * 4]);
+		outGrid[(gridSize.x-1) * gridSize.y + j].soundPressure = murX[0][2 + j * 4] + (v*dt-dx)/(v*dt+dx) * (inGrid[(gridSize.x-2) * gridSize.y + j].soundPressure - murX[0][3 + j * 4]);
+		j = gridSize.y - 2;
+		outGrid[0 * gridSize.y + j].soundPressure = murX[0][1 + j * 4] + (v*dt-dx)/(v*dt+dx) * (inGrid[1 * gridSize.y + j].soundPressure - murX[0][0 + j * 4]);
+		outGrid[(gridSize.x-1) * gridSize.y + j].soundPressure = murX[0][2+ j * 4] + (v*dt-dx)/(v*dt+dx) * (inGrid[(gridSize.x-2) * gridSize.y + j].soundPressure - murX[0][3 + j * 4]);
+	}
 }
 
 __global__ void mur2ndCopy(glm::ivec2 dataPerThread, glm::ivec2 gridSize, AcousticFDTD::SpacePoint * grid, float * murX[2], float * murY[2])
@@ -164,26 +164,26 @@ __global__ void mur2ndCopy(glm::ivec2 dataPerThread, glm::ivec2 gridSize, Acoust
 
 	for(unsigned int i = startI; i < rangeI; ++i)
 	{
-		/* Copy 1st Old Values to 2nd Old Values*/
+		// Copy 1st Old Values to 2nd Old Values
 		for(unsigned int j = 0; j < 4; ++j)
 		{
 			murY[1][i * 4 + j] = murY[0][i * 4 + j];
 		}
 
-		/* Copy Present Values */
+		// Copy Present Values
 		murY[0][i * 4 + 0] = grid[i * gridSize.y + 0].soundPressure;
 		murY[0][i * 4 + 1] = grid[i * gridSize.y + 1].soundPressure;
 		murY[0][i * 4 + 2] = grid[i * gridSize.y + gridSize.y-2].soundPressure;
 		murY[0][i * 4 + 3] = grid[i * gridSize.y + gridSize.y-1].soundPressure;
 	}
 	for(unsigned int j = startJ; j < rangeJ; ++j){
-		/* Copy 1st Old Values to 2nd Old Values*/
+		// Copy 1st Old Values to 2nd Old Values
 		for(unsigned int i = 0; i < 4; ++i)
 		{
 			murX[1][i + j * 4] = murX[0][i + j * 4];
 		}
 
-		/* Copy Present Values */
+		// Copy Present Values
 		murX[0][0 + j * 4] = grid[0 * gridSize.y + j].soundPressure;
 		murX[0][1 + j * 4] = grid[1 * gridSize.y + j].soundPressure;
 		murX[0][2 + j * 4] = grid[(gridSize.x-2) * gridSize.y + j].soundPressure;
@@ -243,8 +243,8 @@ void AcousticFDTD::draw()
 	CudaCheckError();
 
 	//copy previous values
-	//mur2ndCopy<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap],
-	                                          //_murX, _murY);
+	mur2ndCopy<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap],
+	                                          _murX, _murY);
 	cudaDeviceSynchronize();
 	CudaCheckError();
 
