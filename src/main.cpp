@@ -25,12 +25,22 @@ int main(int argc, char * argv[])
 	/////////////// FDTD INITIALIZATION
 	float surfaceScale = 5.f;
 	glm::vec2 surfaceSize = {2 * surfaceScale, 2 * surfaceScale};
-	float resolution = 0.5f;
-	if(argc > 1)
+	float resolution = 0.1f;
+	unsigned int dataPerThread = 1;
+	unsigned int blockSize = 32; // 32 x 32
+	for(unsigned int i = 1; i < argc; ++i)
 	{
-		if(!strcmp(argv[1], "-r"))
+		if (!strcmp(argv[i], "-r"))
 		{
-			resolution = atof(argv[2]);
+			resolution = atof(argv[i + 1]);
+		}
+		if (!strcmp(argv[i], "-dpt"))
+		{
+			dataPerThread = atoi(argv[i + 1]);
+		}
+		if (!strcmp(argv[i], "-bs"))
+		{
+			blockSize = atoi(argv[i + 1]);
 		}
 	}
 	glm::ivec2 gridSize = {surfaceSize.x / resolution, surfaceSize.y / resolution};
@@ -96,7 +106,7 @@ int main(int argc, char * argv[])
 
 	Renderable points{pointsVertices, GL_POINTS, pointSize};
 	GLuint * vbo = points.getVBO();
-	AcousticFDTD fdtd(gridSize, vbo);
+	AcousticFDTD fdtd(gridSize, vbo, blockSize, dataPerThread);
 	points.initVAO();
 
 	/////////////////

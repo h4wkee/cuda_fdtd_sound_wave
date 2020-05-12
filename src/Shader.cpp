@@ -7,17 +7,7 @@
 
 static const std::string shadersDirectory = "resources/shaders/";
 
-std::vector<std::pair<std::string, Shader::DefineValue>> Shader::_globalDefines {};
-
-static std::string shaderNames[] = // h4wkee: temporary solution
-		{
-				"texture_diffuse0",
-				"texture_specular0",
-				"texture_normal0"
-		};
-
-Shader::Shader(const std::string & name, bool geometryShader):
-		_geometryShader{ geometryShader }
+Shader::Shader(const std::string & name)
 {
 	load(name);
 }
@@ -32,7 +22,7 @@ Shader * Shader::_active = nullptr;
 bool Shader::reload()
 {
 	_free();
-	bool loaded = load(_name + ".vert", _name + ".frag", _geometryShader ? _name + ".geom" : "");
+	bool loaded = load(_name + ".vert", _name + ".frag");
 
 	if(loaded)
 	{
@@ -52,7 +42,7 @@ bool Shader::load(const std::string & name)
 	return reload();
 }
 
-bool Shader::load(const std::string & vertexFileName, const std::string & fragmentFileName, const std::string & geometryFileName)
+bool Shader::load(const std::string & vertexFileName, const std::string & fragmentFileName)
 {
 	//_uniforms.clear(); // clear uniform map
 
@@ -63,26 +53,10 @@ bool Shader::load(const std::string & vertexFileName, const std::string & fragme
 	GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	GLuint geometryShader = 0;
 
-	if (_geometryShader)
-	{
-		std::string geometryPath = shadersDirectory + geometryFileName;
-		geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
-		if (!_compile(geometryPath, geometryShader))
-		{
-			glDeleteShader(vertexShader);
-			glDeleteShader(geometryShader);
-			glDeleteShader(fragmentShader);
-			return false;
-		}
-	}
 	if(!_compile(vertexPath, vertexShader) || !_compile(fragmentPath, fragmentShader))
 	{
 		glDeleteShader(vertexShader);
 		glDeleteShader(fragmentShader);
-		if (_geometryShader)
-		{
-			glDeleteShader(geometryShader);
-		}
 
 		return false;
 	}
@@ -93,21 +67,11 @@ bool Shader::load(const std::string & vertexFileName, const std::string & fragme
 
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
-	if (_geometryShader)
-	{
-		glDeleteShader(geometryShader);
-	}
 
 	if (linkResult)
 	{
 		Shader * active = _active;
 		use();
-		for (unsigned i = 0; i < uniformCount; ++i)
-		{
-			std::string uniformName = shaderNames[i]; //h4wkee: temporary solution
-			int uniformLocation = glGetUniformLocation(_program, uniformName.c_str());
-			_uniforms[i] = uniformLocation;
-		}
 		if (active)
 		{
 			active->use();
@@ -154,26 +118,6 @@ bool Shader::_compile(const std::string& path, GLuint shader)
 	// bake header - GLSL version and run-time specified defines
 	std::string versionString = "#version " + std::to_string(GLVersion.major) + std::to_string(GLVersion.minor) + "0" + "\n";
 	headerSource += versionString;
-
-	for (auto & define : _defines)
-	{
-		if (getDefineType(define.first) == "bool" && !define.second) // skip if bool value is false
-		{
-			continue;
-		}
-		headerSource += _getDefineCode(define.first, define.second) + "\n";
-	}
-
-	for (auto & define : _globalDefines)
-	{
-		if (getDefineType(define.first) == "bool" && !define.second) // skip if bool value is false
-		{
-			continue;
-		}
-		headerSource += "#ifndef " + getDefineName(define.first) + "\n";
-		headerSource += "\t" + _getDefineCode(define.first, define.second) + "\n";
-		headerSource += "#endif\n";
-	}
 
 	// parse includes
 	{
@@ -238,19 +182,11 @@ bool Shader::_link(GLuint vertexShader, GLuint fragmentShader, GLuint geometrySh
 {
 	glAttachShader(_program, vertexShader);
 	glAttachShader(_program, fragmentShader);
-	if (_geometryShader)
-	{
-		glAttachShader(_program, geometryShader);
-	}
 
 	glLinkProgram(_program);
 
 	glDetachShader(_program, vertexShader);
 	glDetachShader(_program, fragmentShader);
-	if (_geometryShader)
-	{
-		glDetachShader(_program, geometryShader);
-	}
 
 	GLint status;
 	glGetProgramiv(_program, GL_LINK_STATUS, &status);
@@ -296,183 +232,15 @@ void Shader::_free()
 	}
 }
 
-std::string Shader::_getDefineCode(const std::string & declaration, DefineValue value)
-{
-	std::string type = getDefineType(declaration);
-	std::string name = getDefineName(declaration);
-	std::string stringValue = "";
-
-	if (type == "bool")
-	{
-		stringValue = std::to_string(bool(value));
-	}
-	if (type == "int")
-	{
-		stringValue = std::to_string(int(value));
-	}
-	if (type == "float")
-	{
-		stringValue = std::to_string(float(value));
-	}
-
-	return "#define " + name + " " + stringValue;
-}
-
-std::string Shader::getDefineType(const std::string & declaration)
-{
-	if (declaration.rfind("int ", 0) == 0)
-	{
-		return "int";
-	}
-	if (declaration.rfind("float ", 0) == 0)
-	{
-		return "float";
-	}
-	return "bool";
-}
-
-std::string Shader::getDefineName(std::string declaration)
-{
-	std::string type = getDefineType(declaration);
-	if (declaration.rfind(type + " ", 0) == 0)
-	{
-		return declaration.replace(0, type.length() + 1, "");
-	}
-	else
-	{
-		return declaration;
-	}
-}
-
 void Shader::use()
 {
 	glUseProgram(_program);
 	_active = this;
 }
 
-void Shader::define(const std::string & name, DefineValue value)
-{
-	auto it = std::find_if(_defines.begin(), _defines.end(), [name](auto define) { return define.first == name; });
-	if (it == _defines.end())
-	{
-		_defines.push_back({ name, value });
-	}
-	else
-	{
-		it->second = value;
-	}
-}
-
-void Shader::globalDefine(const std::string & name, DefineValue value)
-{
-	auto it = std::find_if(_globalDefines.begin(), _globalDefines.end(), [name](auto define) { return define.first == name; });
-	if (it == _globalDefines.end())
-	{
-		_globalDefines.push_back({ name, value });
-	}
-	else
-	{
-		it->second = value;
-	}
-}
-
-Shader::DefineValue Shader::getGlobalDefine(const std::string & name)
-{
-	auto it = std::find_if(_globalDefines.begin(), _globalDefines.end(), [name](auto define) { return define.first == name; });
-	if (it == _globalDefines.end())
-	{
-		return 0.f;
-	}
-	else
-	{
-		return it->second;
-	}
-}
-
-void Shader::setUniform1(const std::string & name, int value)
-{
-	int location = _getUniform(name);
-	if (location != -1)
-	{
-		glUniform1i(location, value);
-	}
-}
-
-void Shader::setUniform1(const std::string & name, float value)
-{
-	int location = _getUniform(name);
-	if (location != -1)
-	{
-		glUniform1f(location, value);
-	}
-}
-
-void Shader::setUniformArray(const std::string & name, float *values, unsigned int count)
-{
-	int location = _getUniform(name);
-	if (location != -1)
-	{
-		glUniform1fv(location, count, values);
-	}
-}
-
-void Shader::setUniform3(const std::string & name, float x, float y, float z)
-{
-	int location = _getUniform(name);
-	if (location != -1)
-	{
-		glUniform3f(location, x, y, z);
-	}
-}
-
 void Shader::setUniform4m(const std::string & name, float * data, int count)
 {
 	int location = _getUniform(name);
-	if (location != -1)
-	{
-		glUniformMatrix4fv(location, count, GL_FALSE, data);
-	}
-}
-
-void Shader::setUniform1(const Uniform uniform, int value)
-{
-	int location = _uniforms[static_cast<unsigned>(uniform)];
-	if (location != -1)
-	{
-		glUniform1i(location, value);
-	}
-}
-
-void Shader::setUniform1(const Uniform uniform, float value)
-{
-	int location = _uniforms[static_cast<unsigned>(uniform)];
-	if (location != -1)
-	{
-		glUniform1f(location, value);
-	}
-}
-
-void Shader::setUniformArray(const Uniform uniform, float *values, unsigned int count)
-{
-	int location = _uniforms[static_cast<unsigned>(uniform)];
-	if (location != -1)
-	{
-		glUniform1fv(location, count, values);
-	}
-}
-
-void Shader::setUniform3(const Uniform uniform, float x, float y, float z)
-{
-	int location = _uniforms[static_cast<unsigned>(uniform)];
-	if (location != -1)
-	{
-		glUniform3f(location, x, y, z);
-	}
-}
-
-void Shader::setUniform4m(const Uniform uniform, float * data, int count)
-{
-	int location = _uniforms[static_cast<unsigned>(uniform)];
 	if (location != -1)
 	{
 		glUniformMatrix4fv(location, count, GL_FALSE, data);

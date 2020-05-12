@@ -5,18 +5,31 @@
 
 #include <CudaHelper.h>
 
-AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo)
+AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo, unsigned int blockSize, unsigned int dataPerThread)
 {
 	_gridSize = gridSize;
-	_dataPerThread = glm::vec2(1, 1);
+	if(dataPerThread > 0 && dataPerThread <= gridSize.x)
+	{
+		_dataPerThread = glm::ivec2(dataPerThread, dataPerThread);
+	}
+	else
+	{
+		_dataPerThread = glm::ivec2(1, 1);
+	}
 
-	CudaSafeCall(cudaGraphicsGLRegisterBuffer(&_cudaVboRes, *vbo, cudaGraphicsMapFlagsNone));
-
-	//_cudaBlockSize = dim3(gridSize.x / _dataPerThread.x, gridSize.y / _dataPerThread.y);
-	_cudaBlockSize = dim3(32, 32);
+	if(blockSize > 0 && blockSize <= 32)
+	{
+		_cudaBlockSize = dim3(blockSize, blockSize);
+	}
+	else
+	{
+		_cudaBlockSize = dim3(32, 32);
+	}
 	const int bx = (gridSize.x + _cudaBlockSize.x - 1) / _cudaBlockSize.x;
 	const int by = (gridSize.y + _cudaBlockSize.y - 1) / _cudaBlockSize.y;
 	_cudaGridSize = dim3(bx, by);
+
+	CudaSafeCall(cudaGraphicsGLRegisterBuffer(&_cudaVboRes, *vbo, cudaGraphicsMapFlagsNone));
 	
 	for(unsigned int i = 0; i < 2; ++i)
 	{

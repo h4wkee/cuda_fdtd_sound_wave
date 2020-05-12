@@ -20,7 +20,7 @@ public:
 		float vy;
 		float soundPressure;
 	};
-	AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo);
+	AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo, unsigned int blockSize = 32, unsigned int dataPerThread = 1);
 	~AcousticFDTD();
 
 	void draw();
