@@ -12,11 +12,8 @@
 //#include <helper_cuda.h>
 //#include <helper_cuda_gl.h>
 
-#define GLM_FORCE_CUDA
-#include "../dependencies/glm/glm/glm.hpp"
-//#include "../dependencies/glm/glm/gtc/matrix_transform.hpp"
-//#include "../dependencies/glm/glm/gtc/type_ptr.hpp"
-//#include "../dependencies/glm/glm/gtx/vector_angle.hpp"
+//#define GLM_FORCE_CUDA
+//#include "../dependencies/glm/glm/glm.hpp"
 
 class AcousticFDTD
 {
@@ -41,8 +38,8 @@ private:
 	float _sigPoint = 0.f;
 
 	SpacePoint * _grid[2];
-	float ** _murX;
-	float ** _murY;
+	float * _murX[2];
+	float * _murY[2];
 
 	float _dx = 10.0e-3;    // Spatial Resolution [m/space_point]
 	float _dt = 15.0e-6;    // Temporal Resolution [s/step]
