@@ -30,17 +30,20 @@ int main(int argc, char * argv[])
 	unsigned int blockSize = 32; // 32 x 32
 	for(unsigned int i = 1; i < argc; ++i)
 	{
-		if (!strcmp(argv[i], "-r"))
+		if(argc > i + 1)
 		{
-			resolution = atof(argv[i + 1]);
-		}
-		if (!strcmp(argv[i], "-dpt"))
-		{
-			dataPerThread = atoi(argv[i + 1]);
-		}
-		if (!strcmp(argv[i], "-bs"))
-		{
-			blockSize = atoi(argv[i + 1]);
+			if (!strcmp(argv[i], "-r"))
+			{
+				resolution = atof(argv[i + 1]);
+			}
+			if (!strcmp(argv[i], "-dpt"))
+			{
+				dataPerThread = atoi(argv[i + 1]);
+			}
+			if (!strcmp(argv[i], "-bs"))
+			{
+				blockSize = atoi(argv[i + 1]);
+			}
 		}
 	}
 	glm::ivec2 gridSize = {surfaceSize.x / resolution, surfaceSize.y / resolution};
