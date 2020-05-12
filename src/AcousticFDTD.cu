@@ -219,7 +219,7 @@ __global__ void updateColors(glm::ivec2 dataPerThread, glm::ivec2 gridSize, Acou
 			float amplifier = 100.f;
 			float grayScale = abs(grid[i * gridSize.y + j].soundPressure) * amplifier;
 			Vertex & v = vertexPointer[(i * gridSize.y + j)];
-			v.color = { grayScale, grayScale, 1.f };
+			v.color = { grayScale, 1.f, 1.f };
 		}
 	}
 }

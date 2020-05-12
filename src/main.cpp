@@ -121,7 +121,6 @@ int main(int argc, char * argv[])
 		auto appTime = std::chrono::high_resolution_clock::now();
 
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(appTime - appStart).count();
-		pointsColor = glm::vec3{sin(duration * 0.01f), 0.5f, 1.f};
 
 		shader.setUniform4m("projection", glm::value_ptr(projection));
 		shader.setUniform4m("view", glm::value_ptr(view));

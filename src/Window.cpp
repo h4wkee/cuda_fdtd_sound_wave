@@ -43,7 +43,6 @@ bool Window::_init(int width, int height)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
 	_window = glfwCreateWindow(_width, _height, "Cuda FDTD Sound Wave", nullptr, nullptr);
 
 	if (!_window)
