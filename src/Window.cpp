@@ -92,9 +92,16 @@ bool Window::update()
 	}
 	else
 	{
-		glfwDestroyWindow(_window);
-		glfwTerminate();
 		return false;
 	}
 	return true;
+}
+
+void Window::close()
+{
+	if(_window)
+	{
+		glfwDestroyWindow(_window);
+		glfwTerminate();
+	}
 }

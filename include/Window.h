@@ -13,6 +13,7 @@ public:
 
 	bool update();
 	bool isOpened(){return _opened;}
+	void close();
 
 private:
 	GLFWwindow * _window;

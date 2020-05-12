@@ -89,8 +89,6 @@ int main(int argc, char * argv[])
 				{surfaceColor.x, surfaceColor.y, surfaceColor.z }
 			}
 	};
-	Renderable surface(surfaceVertices, GL_TRIANGLES);
-	surface.initVAO();
 
 	std::vector<Vertex> pointsVertices;
 	pointsVertices.reserve(gridSize.x * gridSize.y);
@@ -107,10 +105,12 @@ int main(int argc, char * argv[])
 	}
 	/////////////////
 
-	Renderable points{pointsVertices, GL_POINTS, pointSize};
-	GLuint * vbo = points.getVBO();
-	AcousticFDTD fdtd(gridSize, vbo, blockSize, dataPerThread);
-	points.initVAO();
+	Renderable * surface = new Renderable(surfaceVertices, GL_TRIANGLES);
+	surface->initVAO();
+	Renderable * points = new Renderable{pointsVertices, GL_POINTS, pointSize};
+	GLuint * vbo = points->getVBO();
+	AcousticFDTD * fdtd = new AcousticFDTD(gridSize, vbo, blockSize, dataPerThread);
+	points->initVAO();
 
 	/////////////////
 
@@ -126,11 +126,16 @@ int main(int argc, char * argv[])
 		shader.setUniform4m("view", glm::value_ptr(view));
 		shader.setUniform4m("model", glm::value_ptr(model));
 
-		surface.draw();
+		surface->draw();
 
-		fdtd.draw();
+		fdtd->draw();
 
-		points.draw();
+		points->draw();
 	}
+
+	delete fdtd;
+	delete points;
+	delete surface;
+	window.close();
 	return 0;
 }

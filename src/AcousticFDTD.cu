@@ -104,8 +104,8 @@ __global__ void mur2nd(glm::ivec2 dataPerThread, glm::ivec2 gridSize, AcousticFD
 	const int startI = (blockIdx.x * blockDim.x + threadIdx.x) * dataPerThread.x;
 	const int startJ = (blockIdx.y * blockDim.y + threadIdx.y) * dataPerThread.y;
 
-	unsigned int rangeI = (startI + dataPerThread.x) < (gridSize.x - 1) ? (startI + dataPerThread.x) : (gridSize.x - 1);
-	unsigned int rangeJ = (startJ + dataPerThread.y) < (gridSize.y - 1) ? (startJ + dataPerThread.y) : (gridSize.y - 1);
+	unsigned int rangeI = (startI + dataPerThread.x) < (gridSize.x - 2) ? (startI + dataPerThread.x) : (gridSize.x - 2);
+	unsigned int rangeJ = (startJ + dataPerThread.y) < (gridSize.y - 2) ? (startJ + dataPerThread.y) : (gridSize.y - 2);
 
 	float v = sqrt(bulkModulus/density);	// Wave velocity
 	int i,j;
@@ -246,13 +246,13 @@ void AcousticFDTD::draw()
 	cudaDeviceSynchronize();
 	CudaCheckError();
 
-	mur2nd<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)!_bufferSwap],
+	mur2nd<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap],
 												_grid[(int)_bufferSwap], _murX[0], _murX[1], _murY[0], _murY[1],
 												_dt, _dx, _density, _bulkModulus);
 	cudaDeviceSynchronize();
 	CudaCheckError();
 
-	mur2ndCorners<<<1, 1>>>(_gridSize, _grid[(int)!_bufferSwap],_grid[(int)_bufferSwap],
+	mur2ndCorners<<<1, 1>>>(_gridSize, _grid[(int)_bufferSwap],_grid[(int)_bufferSwap],
 												_murX[0], _murX[1], _murY[0], _murY[1], _dt, _dx, _density, _bulkModulus);
 	cudaDeviceSynchronize();
 	CudaCheckError();
