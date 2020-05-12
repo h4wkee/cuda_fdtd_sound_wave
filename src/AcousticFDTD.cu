@@ -153,7 +153,7 @@ __global__ void mur2nd(glm::ivec2 dataPerThread, glm::ivec2 gridSize, AcousticFD
 }
 
 __global__ void mur2ndCopy(glm::ivec2 dataPerThread, glm::ivec2 gridSize, AcousticFDTD::SpacePoint * grid,
-		float * murX1, float * murX2, float * murY1, float * murY2,)
+		float * murX1, float * murX2, float * murY1, float * murY2)
 {
 	const int startI = (blockIdx.x * blockDim.x + threadIdx.x) * dataPerThread.x;
 	const int startJ = (blockIdx.y * blockDim.y + threadIdx.y) * dataPerThread.y;
