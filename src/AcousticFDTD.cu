@@ -270,12 +270,11 @@ void AcousticFDTD::draw()
 
 	CudaSafeCall(cudaGraphicsUnmapResources(1, &_cudaVboRes, 0));
 
-	++_nPoint;
-
-	if(_nPoint > _randomPointSourceInterval)
+	if(_nPoint % _randomPointSourceInterval == 0)
 	{
 		randomPointSource();
 	}
+	++_nPoint;
 
 	_bufferSwap = !_bufferSwap;
 }
@@ -284,5 +283,4 @@ void AcousticFDTD::randomPointSource()
 {
 	_pointSource.x = rand() % _gridSize.x;
 	_pointSource.y = rand() % _gridSize.y;
-	_nPoint = 0;
 }
