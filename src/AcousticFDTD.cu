@@ -2,6 +2,7 @@
 
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <chrono>
 
 #include <CudaHelper.h>
 
@@ -216,7 +217,7 @@ __global__ void updateColors(glm::ivec2 dataPerThread, glm::ivec2 gridSize, Acou
 	{
 		for(unsigned int j = startJ; j < rangeJ; ++j)
 		{
-			float amplifier = 100.f;
+			float amplifier = 80.f;
 			float grayScale = abs(grid[i * gridSize.y + j].soundPressure) * amplifier;
 			Vertex & v = vertexPointer[(i * gridSize.y + j)];
 			v.color = { grayScale, 1.f, 1.f };
@@ -231,6 +232,8 @@ __global__ void updatePoint(glm::ivec2 gridSize, AcousticFDTD::SpacePoint * grid
 
 void AcousticFDTD::draw()
 {
+	auto loopStart = std::chrono::high_resolution_clock::now();
+
 	CudaSafeCall(cudaGraphicsMapResources(1, &_cudaVboRes, 0));
 	size_t size;
 	CudaSafeCall(cudaGraphicsResourceGetMappedPointer((void **)(&_vertexPointer), &size, _cudaVboRes));
@@ -270,8 +273,13 @@ void AcousticFDTD::draw()
 
 	CudaSafeCall(cudaGraphicsUnmapResources(1, &_cudaVboRes, 0));
 
+	auto loopEnd = std::chrono::high_resolution_clock::now();
+
 	if(_nPoint % _randomPointSourceInterval == 0)
 	{
+		auto loopTime = std::chrono::duration_cast<std::chrono::microseconds>(loopEnd - loopStart).count();
+		std::cout << "Loop time: " << loopTime / 1e3 << "ms\n";
+		_nPoint = 0;
 		randomPointSource();
 	}
 	++_nPoint;

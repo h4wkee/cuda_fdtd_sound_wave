@@ -3,7 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/vector_angle.hpp>
-#include <chrono>
+#include <ctime>
 
 #include <Window.h>
 #include <Shader.h>
@@ -34,7 +34,7 @@ int main(int argc, char * argv[])
 		{
 			if (!strcmp(argv[i], "-r"))
 			{
-				resolution = atof(argv[i + 1]);
+				resolution = 10.f/atof(argv[i + 1]);
 			}
 			if (!strcmp(argv[i], "-dpt"))
 			{
@@ -114,14 +114,8 @@ int main(int argc, char * argv[])
 
 	/////////////////
 
-	auto appStart = std::chrono::high_resolution_clock::now();
-
 	while(window.update())
 	{
-		auto appTime = std::chrono::high_resolution_clock::now();
-
-		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(appTime - appStart).count();
-
 		shader->setUniform4m("projection", glm::value_ptr(projection));
 		shader->setUniform4m("view", glm::value_ptr(view));
 		shader->setUniform4m("model", glm::value_ptr(model));
