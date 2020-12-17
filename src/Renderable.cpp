@@ -1,7 +1,5 @@
 #include <Renderable.h>
 
-#include <Window.h>
-
 Renderable::Renderable()
 {
 
