@@ -8,6 +8,11 @@
 
 AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo, unsigned int blockSize, unsigned int dataPerThread)
 {
+	if(vbo)
+	{
+		this->_oglContext = true;
+	}
+
 	_gridSize = gridSize;
 	if(dataPerThread > 0 && dataPerThread <= gridSize.x)
 	{
@@ -30,8 +35,11 @@ AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo, unsigned int blo
 	const int by = (gridSize.y + _cudaBlockSize.y - 1) / _cudaBlockSize.y;
 	_cudaGridSize = dim3(bx, by);
 
-	CudaSafeCall(cudaGraphicsGLRegisterBuffer(&_cudaVboRes, *vbo, cudaGraphicsMapFlagsNone));
-	
+	if(this->_oglContext)
+	{
+		CudaSafeCall(cudaGraphicsGLRegisterBuffer(&_cudaVboRes, *vbo, cudaGraphicsMapFlagsNone));
+	}
+
 	for(unsigned int i = 0; i < 2; ++i)
 	{
 		CudaSafeCall(cudaMalloc((void **)&_grid[i], (gridSize.x + 1) * (gridSize.y + 1) * sizeof(SpacePoint)));
@@ -45,7 +53,10 @@ AcousticFDTD::AcousticFDTD(glm::ivec2 & gridSize, GLuint * vbo, unsigned int blo
 
 AcousticFDTD::~AcousticFDTD()
 {
-	CudaSafeCall(cudaGraphicsUnregisterResource(_cudaVboRes));
+	if(this->_oglContext)
+	{
+		CudaSafeCall(cudaGraphicsUnregisterResource(_cudaVboRes));
+	}
 
 	CudaSafeCall(cudaFree(_grid[0]));
 	CudaSafeCall(cudaFree(_grid[1]));
@@ -234,9 +245,12 @@ void AcousticFDTD::draw()
 {
 	auto loopStart = std::chrono::high_resolution_clock::now();
 
-	CudaSafeCall(cudaGraphicsMapResources(1, &_cudaVboRes, 0));
-	size_t size;
-	CudaSafeCall(cudaGraphicsResourceGetMappedPointer((void **)(&_vertexPointer), &size, _cudaVboRes));
+	if(this->_oglContext)
+	{
+		CudaSafeCall(cudaGraphicsMapResources(1, &_cudaVboRes, 0));
+		size_t size;
+		CudaSafeCall(cudaGraphicsResourceGetMappedPointer((void **)(&_vertexPointer), &size, _cudaVboRes));
+	}
 
 	updateV<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)!_bufferSwap],
 												_grid[(int)_bufferSwap], _dtOverDx, _density);
@@ -267,11 +281,14 @@ void AcousticFDTD::draw()
 		CudaCheckError();
 	}
 
-	updateColors<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap], _vertexPointer);
-	cudaDeviceSynchronize();
-	CudaCheckError();
+	if(this->_oglContext)
+	{
+		updateColors<<<_cudaGridSize, _cudaBlockSize>>>(_dataPerThread, _gridSize, _grid[(int)_bufferSwap], _vertexPointer);
+		cudaDeviceSynchronize();
+		CudaCheckError();
 
-	CudaSafeCall(cudaGraphicsUnmapResources(1, &_cudaVboRes, 0));
+		CudaSafeCall(cudaGraphicsUnmapResources(1, &_cudaVboRes, 0));
+	}
 
 	auto loopEnd = std::chrono::high_resolution_clock::now();
 

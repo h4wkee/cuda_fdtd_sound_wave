@@ -2,9 +2,6 @@
 
 #include <iostream>
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-
 #include "Vertex.h"
 
 #include <cuda.h>
@@ -27,9 +24,11 @@ public:
 	void randomPointSource();
 private:
 
+	bool _oglContext = false;
+
 	glm::ivec2 _gridSize = {};
 	glm::ivec2 _pointSource = {};
-	int _randomPointSourceInterval = 500;
+	int _randomPointSourceInterval = 250;
 	int _nPoint = 0;
 	float _sigPoint = 0.f;
 
