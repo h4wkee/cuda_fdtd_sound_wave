@@ -1,5 +1,6 @@
 #pragma once
 
+#define _USE_MATH_DEFINES
 #include <iostream>
 
 #include <glm/gtc/matrix_transform.hpp>

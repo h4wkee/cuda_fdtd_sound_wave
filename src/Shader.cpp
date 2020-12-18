@@ -1,5 +1,6 @@
 #include <Shader.h>
 
+#define _USE_MATH_DEFINES
 #include <iostream>
 #include <string>
 #include <algorithm>

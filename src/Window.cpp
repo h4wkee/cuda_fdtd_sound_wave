@@ -1,5 +1,6 @@
 #include <Window.h>
 
+#define _USE_MATH_DEFINES
 #include <iostream>
 
 Window::Window(unsigned int width, unsigned int height)
