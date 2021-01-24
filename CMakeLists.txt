@@ -32,4 +32,5 @@ set_target_properties(
         cuda_fdtd_sound_wave
         PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/build"
+        
 )
