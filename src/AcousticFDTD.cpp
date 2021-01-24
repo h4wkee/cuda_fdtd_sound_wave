@@ -2,6 +2,7 @@
 
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include <chrono>
 
 AcousticFDTD::AcousticFDTD(glm::vec3 * gridColors, glm::ivec2 & gridSize)
 {
@@ -144,6 +145,8 @@ void AcousticFDTD::mur2ndCopy()
 
 void AcousticFDTD::draw()
 {
+	auto loopStart = std::chrono::high_resolution_clock::now();
+
 	updateV();
 	updateP();
 
@@ -166,13 +169,18 @@ void AcousticFDTD::draw()
 			_gridColors[i * _gridSize.y + j] = {grayScale, grayScale, grayScale};
 		}
 	}
+	auto loopEnd = std::chrono::high_resolution_clock::now();
 
-	++_nPoint;
-
-	if(_nPoint > _randomPointSourceInterval)
+	if(_nPoint % _randomPointSourceInterval == 0)
 	{
+		auto loopTime = std::chrono::duration_cast<std::chrono::microseconds>(loopEnd - loopStart).count();
+		std::cout << "Loop time: " << loopTime / 1e3 << "ms\n";
+		_nPoint = 0;
+		randomPointSource();
 		randomPointSource();
 	}
+	++_nPoint;
+
 }
 
 void AcousticFDTD::randomPointSource()
