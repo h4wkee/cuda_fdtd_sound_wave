@@ -2,7 +2,6 @@
 
 #include <omp.h>
 
-#define _USE_MATH_DEFINES
 #define FDTD_LOOP _Pragma("omp for collapse(2)")
 
 #include <chrono>
