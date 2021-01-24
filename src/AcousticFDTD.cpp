@@ -142,41 +142,6 @@ void AcousticFDTD::mur2ndCopy()
 		}
 }
 
-void AcousticFDTD::mur1st()
-{
-	float v = sqrt(_bulkModulus/_density);
-
-	for(int i=1;i<_gridSize.x-1;i++){
-		_grid[i * _gridSize.y + 0].soundPressure = _murY1[i * 4 + 1] + (v*_dt-_dx)/(v*_dt+_dx) * (_grid[i * _gridSize.y + 1].soundPressure - _murY1[i * 4 + 0]);
-		_grid[i * _gridSize.y + _gridSize.y-1].soundPressure = _murY1[i * 4 + 2] + (v*_dt-_dx)/(v*_dt+_dx) * (_grid[i * _gridSize.y + _gridSize.y-2].soundPressure - _murY1[i * 4 + 3]);
-	}
-	for(int j=1;j<_gridSize.y-1;j++){
-		_grid[0 * _gridSize.y + j].soundPressure = _murX1[1 + j * 4] + (v*_dt-_dx)/(v*_dt+_dx) * (_grid[1 * _gridSize.y + j].soundPressure - _murX1[0 + j * 4]);
-		_grid[(_gridSize.x-1) * _gridSize.y + j].soundPressure = _murX1[2 + j * 4] + (v*_dt-_dx)/(v*_dt+_dx) * (_grid[(_gridSize.x-2) * _gridSize.y + j].soundPressure - _murX1[3 + j * 4]);
-	}
-
-	/* Copy Previous Values */
-	mur1stCopy();
-}
-
-/* Copy the Filed Values for Mur's 1st Order Absorption */
-void AcousticFDTD::mur1stCopy()
-{
-	/* Copy Previous Values */
-	for(int i=0;i<_gridSize.x;i++){
-		_murY1[i * 4 + 0] = _grid[i * _gridSize.y + 0].soundPressure;
-		_murY1[i * 4 + 1] = _grid[i * _gridSize.y + 1].soundPressure;
-		_murY1[i * 4 + 2] = _grid[i * _gridSize.y + _gridSize.y-2].soundPressure;
-		_murY1[i * 4 + 3] = _grid[i * _gridSize.y + _gridSize.y-1].soundPressure;
-	}
-	for(int j=0;j<_gridSize.y;j++){
-		_murX1[0 + j * 4] = _grid[0 * _gridSize.y + j].soundPressure;
-		_murX1[1 + j * 4] = _grid[1 * _gridSize.y + j].soundPressure;
-		_murX1[2 + j * 4] = _grid[(_gridSize.x-2) * _gridSize.y + j].soundPressure;
-		_murX1[3 + j * 4] = _grid[(_gridSize.x-1) * _gridSize.y + j].soundPressure;
-	}
-}
-
 void AcousticFDTD::draw()
 {
 	updateV();
