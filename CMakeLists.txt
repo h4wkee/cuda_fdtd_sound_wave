@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(cuda_fdtd_sound_wave)
+project(cuda_fdtd_sound_wave LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -8,6 +8,7 @@ if(WIN32)
 endif()
 
 find_package(OpenGL)
+find_package(OpenMP REQUIRED)
 
 include_directories(
         include
@@ -29,7 +30,7 @@ add_executable(cuda_fdtd_sound_wave ${SRC_FILES})
 
 add_dependencies(cuda_fdtd_sound_wave glad glfw glm)
 #add_dependencies(cuda_fdtd_sound_wave glad glm)
-target_link_libraries(cuda_fdtd_sound_wave glad glfw glm ${OPENGL_gl_LIBRARY})
+target_link_libraries(cuda_fdtd_sound_wave glad glfw glm ${OPENGL_gl_LIBRARY} OpenMP::OpenMP_CXX)
 
 set_target_properties(
         cuda_fdtd_sound_wave
