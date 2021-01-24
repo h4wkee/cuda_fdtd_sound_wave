@@ -27,11 +27,14 @@ int main(int argc, char * argv[])
 	float surfaceScale = 5.f;
 	glm::vec2 surfaceSize = {2 * surfaceScale, 2 * surfaceScale};
 	float resolution = 0.1f;
-	if(argc > 1)
+	for(unsigned int i = 0; i < argc; ++i)
 	{
-		if(!strcmp(argv[1], "-r"))
+		if(argc > i + 1)
 		{
-			resolution = atof(argv[2]);
+			if(!strcmp(argv[i], "-r"))
+			{
+				resolution = 10.f/atof(argv[2]);
+			}
 		}
 	}
 	glm::ivec2 gridSize = {surfaceSize.x / resolution, surfaceSize.y / resolution};

@@ -2,6 +2,7 @@
 
 #define _USE_MATH_DEFINES
 #include <iostream>
+#include <cmath>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -21,9 +22,7 @@ public:
 
 	void updateV();
 	void updateP();
-	void mur1st();
 	void mur2nd();
-	void mur1stCopy();
 	void mur2ndCopy();
 
 	void draw();
@@ -51,4 +50,5 @@ private:
 	float _density   = 1.29;    // [kg/m^3]
 	float _bulkModulus = 142.0e3;	// [Pa]
 	float _freq = 1.0e3;    // Frequency of Initial Waveform [Hz]
+	float _v = sqrt(_bulkModulus/_density);	// Wave velocity
 };
