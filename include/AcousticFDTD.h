@@ -31,7 +31,7 @@ private:
 
 	glm::ivec2 _gridSize = {};
 	glm::ivec2 _pointSource = {};
-	int _randomPointSourceInterval = 100;
+	int _randomPointSourceInterval = 250;
 	int _nPoint = 0;
 	float _sigPoint = 0.f;
 

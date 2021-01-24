@@ -184,15 +184,17 @@ void AcousticFDTD::draw()
 			}
 		}
 		//setGridColors
-		FDTD_LOOP
-		for(unsigned int i = 0; i < _gridSize.x; ++i)
+		if(_gridColors) // _gridColors is nullptr when there's no OGL context
 		{
-			for(unsigned int j = 0; j < _gridSize.y; ++j)
+			FDTD_LOOP for(unsigned int i = 0; i < _gridSize.x; ++i)
 			{
-				float amplifier = 100.f;
-				float grayScale = abs(_grid[i * _gridSize.y + j].soundPressure) * amplifier;
-				//std::cout << "GRAY SCALE: " << grayScale << std::endl;
-				_gridColors[i * _gridSize.y + j] = {grayScale, grayScale, grayScale};
+				for(unsigned int j = 0; j < _gridSize.y; ++j)
+				{
+					float amplifier = 100.f;
+					float grayScale = abs(_grid[i * _gridSize.y + j].soundPressure) * amplifier;
+					//std::cout << "GRAY SCALE: " << grayScale << std::endl;
+					_gridColors[i * _gridSize.y + j] = {grayScale, grayScale, grayScale};
+				}
 			}
 		}
 
