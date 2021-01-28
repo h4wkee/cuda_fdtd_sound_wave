@@ -22,14 +22,14 @@ Renderable::Renderable(Renderable && renderable) noexcept
 
 Renderable::~Renderable()
 {
-	if (_vbo)
-	{
-		glDeleteBuffers(1, &_vbo);
-	}
-	if (_vao)
-	{
-		glDeleteVertexArrays(1, &_vao);
-	}
+//	if (_vbo)
+//	{
+//		glDeleteBuffers(1, &_vbo);
+//	}
+//	if (_vao)
+//	{
+//		glDeleteVertexArrays(1, &_vao);
+//	}
 }
 
 void Renderable::draw()

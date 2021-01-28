@@ -284,17 +284,17 @@ int Shader::_getUniform(const std::string & name)
 
 void Shader::_free()
 {
-	if(_program != 0)
-	{
-		GLint program;
-		glGetIntegerv(GL_CURRENT_PROGRAM, &program);
-		if(_program == program)
-		{
-			glUseProgram(0);
-		}
-		glDeleteProgram(_program);
-		_program = 0;
-	}
+//	if(_program != 0)
+//	{
+//		GLint program;
+//		glGetIntegerv(GL_CURRENT_PROGRAM, &program);
+//		if(_program == program)
+//		{
+//			glUseProgram(0);
+//		}
+//		glDeleteProgram(_program);
+//		_program = 0;
+//	}
 }
 
 std::string Shader::_getDefineCode(const std::string & declaration, DefineValue value)
